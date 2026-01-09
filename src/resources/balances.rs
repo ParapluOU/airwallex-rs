@@ -5,7 +5,7 @@
 use crate::client::Client;
 use crate::error::Result;
 use crate::models::balances::{
-    BalanceHistoryParams, BalanceHistoryResponse, CurrentBalancesResponse,
+    Balance, BalanceHistoryParams, BalanceHistoryResponse, CurrentBalancesResponse,
 };
 
 /// The Balances resource.
@@ -45,7 +45,9 @@ impl<'a> Balances<'a> {
     ///
     /// `GET /api/v1/balances/current`
     pub async fn current(&self) -> Result<CurrentBalancesResponse> {
-        self.client.get("/api/v1/balances/current").await
+        // The API returns a raw array, not an object with items
+        let balances: Vec<Balance> = self.client.get("/api/v1/balances/current").await?;
+        Ok(CurrentBalancesResponse::new(balances))
     }
 
     /// Get balance history.

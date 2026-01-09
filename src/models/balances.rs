@@ -17,13 +17,27 @@ pub struct Balance {
     /// Reserved balance (held for pending operations).
     #[serde(default)]
     pub reserved_amount: f64,
+    /// Total balance.
+    #[serde(default)]
+    pub total_amount: f64,
+    /// Prepayment amount.
+    #[serde(default)]
+    pub prepayment_amount: f64,
 }
 
 /// Response from GET /balances/current.
-#[derive(Debug, Clone, Deserialize)]
+/// Note: The API returns a raw array, so we use a wrapper for convenience.
+#[derive(Debug, Clone)]
 pub struct CurrentBalancesResponse {
     /// List of balances by currency.
     pub items: Vec<Balance>,
+}
+
+impl CurrentBalancesResponse {
+    /// Create from a vector of balances.
+    pub fn new(items: Vec<Balance>) -> Self {
+        Self { items }
+    }
 }
 
 /// A single balance history entry.

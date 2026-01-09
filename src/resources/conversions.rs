@@ -24,10 +24,10 @@ impl<'a> Conversions<'a> {
     ///
     /// # API Reference
     ///
-    /// `GET /api/v1/conversions`
+    /// `GET /api/v1/fx/conversions`
     pub async fn list(&self, params: ListConversionsParams) -> Result<ListConversionsResponse> {
         self.client
-            .get_with_query("/api/v1/conversions", &params)
+            .get_with_query("/api/v1/fx/conversions", &params)
             .await
     }
 
@@ -35,10 +35,10 @@ impl<'a> Conversions<'a> {
     ///
     /// # API Reference
     ///
-    /// `POST /api/v1/conversions/create`
+    /// `POST /api/v1/fx/conversions/create`
     pub async fn create(&self, request: CreateConversionRequest) -> Result<Conversion> {
         self.client
-            .post("/api/v1/conversions/create", &request)
+            .post("/api/v1/fx/conversions/create", &request)
             .await
     }
 
@@ -46,10 +46,10 @@ impl<'a> Conversions<'a> {
     ///
     /// # API Reference
     ///
-    /// `GET /api/v1/conversions/{conversion_id}`
+    /// `GET /api/v1/fx/conversions/{conversion_id}`
     pub async fn get(&self, conversion_id: &str) -> Result<Conversion> {
         self.client
-            .get(&format!("/api/v1/conversions/{}", conversion_id))
+            .get(&format!("/api/v1/fx/conversions/{}", conversion_id))
             .await
     }
 
@@ -57,8 +57,8 @@ impl<'a> Conversions<'a> {
     ///
     /// # API Reference
     ///
-    /// `POST /api/v1/rates/quote`
+    /// `POST /api/v1/fx/quotes/create`
     pub async fn quote(&self, request: RateQuoteRequest) -> Result<RateQuote> {
-        self.client.post("/api/v1/rates/quote", &request).await
+        self.client.post("/api/v1/fx/quotes/create", &request).await
     }
 }

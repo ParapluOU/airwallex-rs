@@ -275,7 +275,9 @@ async fn test_customer_create_and_get() {
     let client = get_client();
 
     let request_id = format!("test-{}", uuid::Uuid::new_v4());
+    let merchant_customer_id = format!("merchant-{}", uuid::Uuid::new_v4());
     let request = CreateCustomerRequest::new(&request_id)
+        .merchant_customer_id(&merchant_customer_id)
         .first_name("Test")
         .last_name("Customer")
         .email("test@example.com");
@@ -407,7 +409,7 @@ async fn test_refunds_list() {
 #[tokio::test]
 async fn test_deposits_list() {
     let client = get_client();
-    let params = ListDepositsParams::new().page_size(10);
+    let params = ListDepositsParams::new().page_num(0).page_size(10);
     let result = client.deposits().list(params).await;
 
     match result {

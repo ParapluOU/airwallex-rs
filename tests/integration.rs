@@ -39,6 +39,8 @@ use airwallex_rs::{
         ListAccountsParams, ListCardsParams, ListCardholdersParams, ListIssuingTransactionsParams,
         ListIssuingAuthorizationsParams, ListConnectedAccountTransfersParams, GetFxRateParams,
         ListPaymentAttemptsParams, ListSettlementsParams, ListIssuingTransactionDisputesParams,
+        ListPaymentMethodTypesParams, ListBanksParams, ListTreasuryBalancesParams,
+        ListFundingLimitsParams, ListAmendmentsParams,
     },
     Client, Error,
 };
@@ -1064,6 +1066,185 @@ async fn test_issuing_config_get() {
             } else {
                 panic!("Unexpected error: {:?}", e);
             }
+        }
+    }
+}
+
+// ============================================================================
+// Payment Config
+// ============================================================================
+
+#[tokio::test]
+async fn test_payment_config_method_types() {
+    let client = get_client();
+    let params = ListPaymentMethodTypesParams::new().page_size(10);
+    let result = client.payment_config().payment_method_types(&params).await;
+
+    match result {
+        Ok(types) => {
+            println!("SUCCESS: Got {} payment method types", types.items.len());
+            for pmt in &types.items {
+                println!(
+                    "  {:?}: active={:?}",
+                    pmt.name, pmt.active
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: payment_config:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+#[tokio::test]
+async fn test_payment_config_banks() {
+    let client = get_client();
+    // Banks endpoint requires payment_method_type and country_code for bank_transfer/online_banking
+    let params = ListBanksParams::new("online_banking").country_code("NL");
+    let result = client.payment_config().banks(&params).await;
+
+    match result {
+        Ok(banks) => {
+            println!("SUCCESS: Got {} banks", banks.items.len());
+            for bank in &banks.items {
+                println!(
+                    "  {:?}: {:?}",
+                    bank.bank_name, bank.display_name
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: payment_config:read permission not available");
+        }
+        Err(e) => {
+            // Banks endpoint may not return data for all payment method types/countries
+            let err_str = format!("{:?}", e);
+            if err_str.contains("not supported") || err_str.contains("invalid") || err_str.contains("not available") {
+                println!("SKIPPED: online_banking for NL may not be available");
+            } else {
+                panic!("Unexpected error: {:?}", e);
+            }
+        }
+    }
+}
+
+// ============================================================================
+// Reconciliation (Treasury Balances)
+// ============================================================================
+
+#[tokio::test]
+async fn test_reconciliation_balances() {
+    let client = get_client();
+    let params = ListTreasuryBalancesParams::new()
+        .currency("USD")
+        .page_size(10);
+    let result = client.reconciliation().balances(&params).await;
+
+    match result {
+        Ok(balances) => {
+            println!("SUCCESS: Got {} treasury balance entries", balances.items.len());
+            for balance in &balances.items {
+                println!(
+                    "  {:?}: {:?} {:?} ({:?})",
+                    balance.id, balance.amount, balance.currency, balance.balance_type
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: reconciliation:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Account Capabilities
+// ============================================================================
+
+#[tokio::test]
+async fn test_account_capabilities_funding_limits() {
+    let client = get_client();
+    let params = ListFundingLimitsParams::new();
+    let result = client.account_capabilities().funding_limits(&params).await;
+
+    match result {
+        Ok(limits) => {
+            println!("SUCCESS: Got {} funding limits", limits.items.len());
+            for limit in &limits.items {
+                println!(
+                    "  {:?}: limit={:?} ({:?})",
+                    limit.currency, limit.limit, limit.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: account_capabilities:read permission not available");
+        }
+        Err(e) => {
+            let err_str = format!("{:?}", e);
+            if err_str.contains("not enabled") || err_str.contains("Scale") {
+                println!("SKIPPED: Account capabilities feature not enabled");
+            } else {
+                panic!("Unexpected error: {:?}", e);
+            }
+        }
+    }
+}
+
+// ============================================================================
+// Conversion Amendments
+// ============================================================================
+
+#[tokio::test]
+async fn test_conversion_amendments_list() {
+    let client = get_client();
+
+    // First, get a conversion to list amendments for
+    let conv_params = ListConversionsParams::new().page_size(10);
+    let conv_result = client.conversions().list(conv_params).await;
+
+    match conv_result {
+        Ok(conversions) => {
+            if conversions.items.is_empty() {
+                println!("SKIPPED: No conversions available to test amendments");
+                return;
+            }
+
+            if let Some(conversion_id) = &conversions.items[0].conversion_id {
+                let params = ListAmendmentsParams::new(conversion_id);
+                let result = client.conversion_amendments().list(&params).await;
+
+                match result {
+                    Ok(amendments) => {
+                        println!("SUCCESS: Got {} conversion amendments for conversion {}", amendments.items.len(), conversion_id);
+                        for amendment in &amendments.items {
+                            println!(
+                                "  {:?}: {:?}",
+                                amendment.amendment_id, amendment.amendment_type
+                            );
+                        }
+                    }
+                    Err(ref e) if is_permission_error(e) => {
+                        println!("SKIPPED: conversion_amendments:read permission not available");
+                    }
+                    Err(e) => {
+                        panic!("Unexpected error: {:?}", e);
+                    }
+                }
+            } else {
+                println!("SKIPPED: Conversion has no ID");
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: conversions:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error getting conversions: {:?}", e);
         }
     }
 }

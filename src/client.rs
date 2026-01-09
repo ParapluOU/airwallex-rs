@@ -385,6 +385,51 @@ impl Client {
     pub fn issuing_cards(&self) -> resources::IssuingCards<'_> {
         resources::IssuingCards::new(self)
     }
+
+    /// Access the Issuing Cardholders resource.
+    pub fn issuing_cardholders(&self) -> resources::IssuingCardholders<'_> {
+        resources::IssuingCardholders::new(self)
+    }
+
+    /// Access the Issuing Transactions resource.
+    pub fn issuing_transactions(&self) -> resources::IssuingTransactions<'_> {
+        resources::IssuingTransactions::new(self)
+    }
+
+    /// Access the Issuing Authorizations resource.
+    pub fn issuing_authorizations(&self) -> resources::IssuingAuthorizations<'_> {
+        resources::IssuingAuthorizations::new(self)
+    }
+
+    /// Access the Issuing Transaction Disputes resource.
+    pub fn issuing_transaction_disputes(&self) -> resources::IssuingTransactionDisputes<'_> {
+        resources::IssuingTransactionDisputes::new(self)
+    }
+
+    /// Access the Issuing Config resource.
+    pub fn issuing_config(&self) -> resources::IssuingConfigResource<'_> {
+        resources::IssuingConfigResource::new(self)
+    }
+
+    /// Access the Account Capabilities resource.
+    pub fn account_capabilities(&self) -> resources::AccountCapabilities<'_> {
+        resources::AccountCapabilities::new(self)
+    }
+
+    /// Access the Payment Attempts resource.
+    pub fn payment_attempts(&self) -> resources::PaymentAttempts<'_> {
+        resources::PaymentAttempts::new(self)
+    }
+
+    /// Access the Connected Account Transfers resource.
+    pub fn connected_account_transfers(&self) -> resources::ConnectedAccountTransfers<'_> {
+        resources::ConnectedAccountTransfers::new(self)
+    }
+
+    /// Access the Conversion Amendments resource.
+    pub fn conversion_amendments(&self) -> resources::ConversionAmendments<'_> {
+        resources::ConversionAmendments::new(self)
+    }
 }
 
 impl Clone for Client {

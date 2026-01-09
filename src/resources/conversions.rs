@@ -5,8 +5,8 @@
 use crate::client::Client;
 use crate::error::Result;
 use crate::models::conversions::{
-    Conversion, CreateConversionRequest, ListConversionsParams, ListConversionsResponse,
-    RateQuote, RateQuoteRequest,
+    Conversion, CreateConversionRequest, CreateQuoteRequest, FxRate, GetFxRateParams,
+    ListConversionsParams, ListConversionsResponse, RateQuote,
 };
 
 /// The Conversions resource.
@@ -53,12 +53,34 @@ impl<'a> Conversions<'a> {
             .await
     }
 
-    /// Get a rate quote.
+    /// Get current FX rate.
+    ///
+    /// # API Reference
+    ///
+    /// `GET /api/v1/fx/rates/current`
+    pub async fn get_rate(&self, params: &GetFxRateParams) -> Result<FxRate> {
+        self.client
+            .get_with_query("/api/v1/fx/rates/current", params)
+            .await
+    }
+
+    /// Create a rate quote with guaranteed rate for an agreed period.
     ///
     /// # API Reference
     ///
     /// `POST /api/v1/fx/quotes/create`
-    pub async fn quote(&self, request: RateQuoteRequest) -> Result<RateQuote> {
-        self.client.post("/api/v1/fx/quotes/create", &request).await
+    pub async fn create_quote(&self, request: &CreateQuoteRequest) -> Result<RateQuote> {
+        self.client.post("/api/v1/fx/quotes/create", request).await
+    }
+
+    /// Get a quote by ID.
+    ///
+    /// # API Reference
+    ///
+    /// `GET /api/v1/fx/quotes/{quote_id}`
+    pub async fn get_quote(&self, quote_id: &str) -> Result<RateQuote> {
+        self.client
+            .get(&format!("/api/v1/fx/quotes/{}", quote_id))
+            .await
     }
 }

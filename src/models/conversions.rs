@@ -226,9 +226,15 @@ pub struct RateQuote {
     /// Quote ID.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub quote_id: Option<String>,
-    /// Quoted rate.
+    /// Quoted client rate.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_rate: Option<f64>,
+    /// AWX reference rate.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub awx_rate: Option<f64>,
+    /// Mid rate.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mid_rate: Option<f64>,
     /// Buy amount.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub buy_amount: Option<f64>,
@@ -241,9 +247,158 @@ pub struct RateQuote {
     /// Sell currency.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sell_currency: Option<String>,
-    /// Quote expiry time.
+    /// Currency pair.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub valid_to: Option<String>,
+    pub currency_pair: Option<String>,
+    /// Dealt currency.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dealt_currency: Option<String>,
+    /// Conversion date.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub conversion_date: Option<String>,
+    /// Quote usage (SINGLE_USE or MULTI_USE).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub usage: Option<String>,
+    /// Quote validity period.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub validity: Option<String>,
+    /// Quote valid from.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub valid_from_at: Option<String>,
+    /// Quote valid to.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub valid_to_at: Option<String>,
+}
+
+/// A current FX rate.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FxRate {
+    /// The rate.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rate: Option<f64>,
+    /// Buy currency.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub buy_currency: Option<String>,
+    /// Sell currency.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sell_currency: Option<String>,
+    /// Currency pair.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_pair: Option<String>,
+    /// Dealt currency.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dealt_currency: Option<String>,
+    /// Conversion date.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub conversion_date: Option<String>,
+    /// Created timestamp.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
+}
+
+/// Parameters for getting current FX rate.
+#[derive(Debug, Clone, Serialize, Default)]
+pub struct GetFxRateParams {
+    /// Sell currency (required).
+    pub sell_currency: String,
+    /// Buy currency (required).
+    pub buy_currency: String,
+    /// Sell amount (mutually exclusive with buy_amount).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sell_amount: Option<f64>,
+    /// Buy amount (mutually exclusive with sell_amount).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub buy_amount: Option<f64>,
+    /// Conversion date.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub conversion_date: Option<String>,
+}
+
+impl GetFxRateParams {
+    /// Create new rate params.
+    pub fn new(sell_currency: impl Into<String>, buy_currency: impl Into<String>) -> Self {
+        Self {
+            sell_currency: sell_currency.into(),
+            buy_currency: buy_currency.into(),
+            sell_amount: None,
+            buy_amount: None,
+            conversion_date: None,
+        }
+    }
+
+    /// Set sell amount.
+    pub fn sell_amount(mut self, amount: f64) -> Self {
+        self.sell_amount = Some(amount);
+        self
+    }
+
+    /// Set buy amount.
+    pub fn buy_amount(mut self, amount: f64) -> Self {
+        self.buy_amount = Some(amount);
+        self
+    }
+
+    /// Set conversion date.
+    pub fn conversion_date(mut self, date: impl Into<String>) -> Self {
+        self.conversion_date = Some(date.into());
+        self
+    }
+}
+
+/// Request to create a quote.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreateQuoteRequest {
+    /// Sell currency (required).
+    pub sell_currency: String,
+    /// Buy currency (required).
+    pub buy_currency: String,
+    /// Quote validity period (required): MIN_1, MIN_15, MIN_30, HR_1, HR_4, HR_8, HR_24.
+    pub validity: String,
+    /// Sell amount (mutually exclusive with buy_amount).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sell_amount: Option<f64>,
+    /// Buy amount (mutually exclusive with sell_amount).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub buy_amount: Option<f64>,
+    /// Conversion date.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub conversion_date: Option<String>,
+}
+
+impl CreateQuoteRequest {
+    /// Create a quote request.
+    pub fn new(
+        sell_currency: impl Into<String>,
+        buy_currency: impl Into<String>,
+        validity: impl Into<String>,
+    ) -> Self {
+        Self {
+            sell_currency: sell_currency.into(),
+            buy_currency: buy_currency.into(),
+            validity: validity.into(),
+            sell_amount: None,
+            buy_amount: None,
+            conversion_date: None,
+        }
+    }
+
+    /// Set sell amount.
+    pub fn sell_amount(mut self, amount: f64) -> Self {
+        self.sell_amount = Some(amount);
+        self
+    }
+
+    /// Set buy amount.
+    pub fn buy_amount(mut self, amount: f64) -> Self {
+        self.buy_amount = Some(amount);
+        self
+    }
+
+    /// Set conversion date.
+    pub fn conversion_date(mut self, date: impl Into<String>) -> Self {
+        self.conversion_date = Some(date.into());
+        self
+    }
 }
 
 /// Request for a rate quote.

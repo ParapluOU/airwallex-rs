@@ -36,7 +36,8 @@ use airwallex_rs::{
         ListRefundsParams, ListTransfersParams, ListInvoicesParams, ListPayersParams,
         ListBatchTransfersParams, ListPaymentMethodsParams, ListPaymentConsentsParams,
         ListFinancialTransactionsParams, ListPaymentLinksParams, ListPaymentDisputesParams,
-        ListAccountsParams, ListCardsParams,
+        ListAccountsParams, ListCardsParams, ListCardholdersParams, ListIssuingTransactionsParams,
+        ListIssuingAuthorizationsParams, ListConnectedAccountTransfersParams, GetFxRateParams,
     },
     Client, Error,
 };
@@ -747,6 +748,168 @@ async fn test_issuing_cards_list() {
             } else {
                 panic!("Unexpected error: {:?}", e);
             }
+        }
+    }
+}
+
+// ============================================================================
+// Issuing Cardholders
+// ============================================================================
+
+#[tokio::test]
+async fn test_issuing_cardholders_list() {
+    let client = get_client();
+    let params = ListCardholdersParams::new().page_size(10);
+    let result = client.issuing_cardholders().list(&params).await;
+
+    match result {
+        Ok(cardholders) => {
+            println!("SUCCESS: Got {} issuing cardholders", cardholders.items.len());
+            for cardholder in &cardholders.items {
+                println!(
+                    "  {:?}: {:?} ({:?})",
+                    cardholder.cardholder_id, cardholder.email, cardholder.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: issuing_cardholders:read permission not available");
+        }
+        Err(e) => {
+            let err_str = format!("{:?}", e);
+            if err_str.contains("not enabled") || err_str.contains("forbidden") {
+                println!("SKIPPED: Issuing feature not enabled for this account");
+            } else {
+                panic!("Unexpected error: {:?}", e);
+            }
+        }
+    }
+}
+
+// ============================================================================
+// Issuing Transactions
+// ============================================================================
+
+#[tokio::test]
+async fn test_issuing_transactions_list() {
+    let client = get_client();
+    let params = ListIssuingTransactionsParams::new().page_size(10);
+    let result = client.issuing_transactions().list(&params).await;
+
+    match result {
+        Ok(transactions) => {
+            println!("SUCCESS: Got {} issuing transactions", transactions.items.len());
+            for txn in &transactions.items {
+                println!(
+                    "  {:?}: {:?} {:?} ({:?})",
+                    txn.transaction_id, txn.transaction_amount, txn.transaction_currency, txn.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: issuing_transactions:read permission not available");
+        }
+        Err(e) => {
+            let err_str = format!("{:?}", e);
+            if err_str.contains("not enabled") || err_str.contains("forbidden") {
+                println!("SKIPPED: Issuing feature not enabled for this account");
+            } else {
+                panic!("Unexpected error: {:?}", e);
+            }
+        }
+    }
+}
+
+// ============================================================================
+// Issuing Authorizations
+// ============================================================================
+
+#[tokio::test]
+async fn test_issuing_authorizations_list() {
+    let client = get_client();
+    let params = ListIssuingAuthorizationsParams::new().page_size(10);
+    let result = client.issuing_authorizations().list(&params).await;
+
+    match result {
+        Ok(authorizations) => {
+            println!("SUCCESS: Got {} issuing authorizations", authorizations.items.len());
+            for auth in &authorizations.items {
+                println!(
+                    "  {:?}: {:?} {:?} ({:?})",
+                    auth.transaction_id, auth.transaction_amount, auth.transaction_currency, auth.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: issuing_authorizations:read permission not available");
+        }
+        Err(e) => {
+            let err_str = format!("{:?}", e);
+            if err_str.contains("not enabled") || err_str.contains("forbidden") {
+                println!("SKIPPED: Issuing feature not enabled for this account");
+            } else {
+                panic!("Unexpected error: {:?}", e);
+            }
+        }
+    }
+}
+
+// ============================================================================
+// Connected Account Transfers
+// ============================================================================
+
+#[tokio::test]
+async fn test_connected_account_transfers_list() {
+    let client = get_client();
+    let params = ListConnectedAccountTransfersParams::new().page_num(0).page_size(10);
+    let result = client.connected_account_transfers().list(&params).await;
+
+    match result {
+        Ok(transfers) => {
+            println!("SUCCESS: Got {} connected account transfers", transfers.items.len());
+            for transfer in &transfers.items {
+                println!(
+                    "  {:?}: {:?} {:?} ({:?})",
+                    transfer.id, transfer.amount, transfer.currency, transfer.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: connected_account_transfers:read permission not available");
+        }
+        Err(e) => {
+            let err_str = format!("{:?}", e);
+            if err_str.contains("not enabled") || err_str.contains("forbidden") || err_str.contains("Scale") {
+                println!("SKIPPED: Scale/Connected Accounts feature not enabled for this account");
+            } else {
+                panic!("Unexpected error: {:?}", e);
+            }
+        }
+    }
+}
+
+// ============================================================================
+// FX Rates
+// ============================================================================
+
+#[tokio::test]
+async fn test_fx_get_rate() {
+    let client = get_client();
+    let params = GetFxRateParams::new("USD", "EUR").buy_amount(1000.0);
+    let result = client.conversions().get_rate(&params).await;
+
+    match result {
+        Ok(rate) => {
+            println!("SUCCESS: Got FX rate");
+            println!("  Rate: {:?}", rate.rate);
+            println!("  Currency pair: {:?}", rate.currency_pair);
+            println!("  Conversion date: {:?}", rate.conversion_date);
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: fx:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
         }
     }
 }

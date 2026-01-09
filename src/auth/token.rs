@@ -68,6 +68,7 @@ impl TokenManager {
     }
 
     /// Get a valid token, refreshing if necessary.
+    #[allow(clippy::collapsible_if)]
     pub async fn get_token(&self) -> Result<Token> {
         // Check if we have a valid token
         {

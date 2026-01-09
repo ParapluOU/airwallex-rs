@@ -141,7 +141,7 @@ impl Config {
             builder = builder.login_as(account_id);
         }
 
-        Ok(builder.build()?)
+        builder.build()
     }
 
     /// Get the base URL for the configured environment.

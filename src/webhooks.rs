@@ -291,6 +291,7 @@ pub fn compute_remote_auth_signature(
 }
 
 /// Verify that a timestamp is within the allowed tolerance.
+#[allow(clippy::collapsible_if)]
 fn verify_timestamp(timestamp_ms_str: &str, tolerance: Duration) -> Result<(), WebhookError> {
     let timestamp_ms: u64 = timestamp_ms_str
         .parse()

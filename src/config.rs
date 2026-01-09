@@ -91,23 +91,38 @@ impl Config {
 
     /// Load configuration from environment variables.
     ///
-    /// Expected variables:
-    /// - `AIRWALLEX_CLIENT_ID` - API client ID
-    /// - `AIRWALLEX_API_KEY` - API key
+    /// Supported variable patterns (checks in order):
+    /// - `AIRWALLEX_CLIENT_ID` / `AIRWALLEX_API_KEY`
+    /// - `AIRWALLEX_SANDBOX_CLIENT_ID` / `AIRWALLEX_SANDBOX_API_KEY` (if environment is sandbox)
+    /// - `AIRWALLEX_PRODUCTION_CLIENT_ID` / `AIRWALLEX_PRODUCTION_API_KEY` (if environment is production)
     /// - `AIRWALLEX_ENVIRONMENT` - "sandbox" or "production" (default: "sandbox")
     pub fn from_env() -> Result<Self> {
         // Try to load .env file, but don't fail if it doesn't exist
         let _ = dotenvy::dotenv();
 
-        let client_id = std::env::var("AIRWALLEX_CLIENT_ID")
-            .map_err(|_| Error::Env("AIRWALLEX_CLIENT_ID not set".to_string()))?;
-
-        let api_key = std::env::var("AIRWALLEX_API_KEY")
-            .map_err(|_| Error::Env("AIRWALLEX_API_KEY not set".to_string()))?;
-
-        let environment = std::env::var("AIRWALLEX_ENVIRONMENT")
+        let environment: Environment = std::env::var("AIRWALLEX_ENVIRONMENT")
             .unwrap_or_else(|_| "sandbox".to_string())
             .parse()?;
+
+        // Try environment-specific vars first, then fall back to generic ones
+        let env_prefix = match environment {
+            Environment::Sandbox => "AIRWALLEX_SANDBOX",
+            Environment::Production => "AIRWALLEX_PRODUCTION",
+        };
+
+        let client_id = std::env::var(format!("{}_CLIENT_ID", env_prefix))
+            .or_else(|_| std::env::var("AIRWALLEX_CLIENT_ID"))
+            .map_err(|_| Error::Env(format!(
+                "Neither {}_CLIENT_ID nor AIRWALLEX_CLIENT_ID is set",
+                env_prefix
+            )))?;
+
+        let api_key = std::env::var(format!("{}_API_KEY", env_prefix))
+            .or_else(|_| std::env::var("AIRWALLEX_API_KEY"))
+            .map_err(|_| Error::Env(format!(
+                "Neither {}_API_KEY nor AIRWALLEX_API_KEY is set",
+                env_prefix
+            )))?;
 
         Ok(Config::builder()
             .client_id(client_id)

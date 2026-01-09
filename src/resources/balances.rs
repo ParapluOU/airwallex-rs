@@ -13,7 +13,7 @@ use crate::models::balances::{
 /// # Example
 ///
 /// ```no_run
-/// # async fn example(client: &airwallex::Client) -> airwallex::Result<()> {
+/// # async fn example(client: &airwallex_rs::Client) -> airwallex_rs::Result<()> {
 /// // Get current balances
 /// let balances = client.balances().current().await?;
 /// for balance in &balances.items {
@@ -21,7 +21,7 @@ use crate::models::balances::{
 /// }
 ///
 /// // Get balance history for USD
-/// use airwallex::models::BalanceHistoryParams;
+/// use airwallex_rs::models::BalanceHistoryParams;
 /// let params = BalanceHistoryParams::new().currency("USD");
 /// let history = client.balances().history(params).await?;
 /// # Ok(())
@@ -60,8 +60,8 @@ impl<'a> Balances<'a> {
     /// # Example
     ///
     /// ```no_run
-    /// # async fn example(client: &airwallex::Client) -> airwallex::Result<()> {
-    /// use airwallex::models::BalanceHistoryParams;
+    /// # async fn example(client: &airwallex_rs::Client) -> airwallex_rs::Result<()> {
+    /// use airwallex_rs::models::BalanceHistoryParams;
     ///
     /// let params = BalanceHistoryParams::new()
     ///     .currency("USD")

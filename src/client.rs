@@ -3,7 +3,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
+use reqwest::header::{AUTHORIZATION, CONTENT_TYPE};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
@@ -20,9 +20,9 @@ use crate::resources;
 /// # Example
 ///
 /// ```no_run
-/// use airwallex::{Client, Config, Environment};
+/// use airwallex_rs::{Client, Config, Environment};
 ///
-/// # async fn example() -> airwallex::Result<()> {
+/// # async fn example() -> airwallex_rs::Result<()> {
 /// // Create from environment variables
 /// let client = Client::from_env()?;
 ///

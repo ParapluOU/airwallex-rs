@@ -88,11 +88,11 @@ impl Error {
 
     /// Check if this error is retryable.
     pub fn is_retryable(&self) -> bool {
-        matches!(
-            self,
-            Error::RateLimited { .. }
-                | Error::Http(e) if e.is_timeout() || e.is_connect()
-        )
+        match self {
+            Error::RateLimited { .. } => true,
+            Error::Http(e) => e.is_timeout() || e.is_connect(),
+            _ => false,
+        }
     }
 
     /// Get the suggested retry delay for rate limited errors.

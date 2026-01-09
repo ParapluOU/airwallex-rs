@@ -105,6 +105,8 @@ impl TokenManager {
             .header("x-client-id", &self.config.client_id)
             .header("x-api-key", self.config.api_key())
             .header("Content-Type", "application/json")
+            .header("Content-Length", "0")
+            .body("")
             .send()
             .await?;
 

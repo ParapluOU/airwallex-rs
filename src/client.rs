@@ -335,6 +335,56 @@ impl Client {
     pub fn refunds(&self) -> resources::Refunds<'_> {
         resources::Refunds::new(self)
     }
+
+    /// Access the Payers resource.
+    pub fn payers(&self) -> resources::Payers<'_> {
+        resources::Payers::new(self)
+    }
+
+    /// Access the Batch Transfers resource.
+    pub fn batch_transfers(&self) -> resources::BatchTransfers<'_> {
+        resources::BatchTransfers::new(self)
+    }
+
+    /// Access the Payment Methods resource.
+    pub fn payment_methods(&self) -> resources::PaymentMethods<'_> {
+        resources::PaymentMethods::new(self)
+    }
+
+    /// Access the Payment Consents resource.
+    pub fn payment_consents(&self) -> resources::PaymentConsents<'_> {
+        resources::PaymentConsents::new(self)
+    }
+
+    /// Access the Financial Transactions resource.
+    pub fn financial_transactions(&self) -> resources::FinancialTransactions<'_> {
+        resources::FinancialTransactions::new(self)
+    }
+
+    /// Access the Payment Links resource.
+    pub fn payment_links(&self) -> resources::PaymentLinks<'_> {
+        resources::PaymentLinks::new(self)
+    }
+
+    /// Access the Payment Disputes resource.
+    pub fn payment_disputes(&self) -> resources::PaymentDisputes<'_> {
+        resources::PaymentDisputes::new(self)
+    }
+
+    /// Access the Settlements resource.
+    pub fn settlements(&self) -> resources::Settlements<'_> {
+        resources::Settlements::new(self)
+    }
+
+    /// Access the Accounts resource (Scale/Connected Accounts).
+    pub fn accounts(&self) -> resources::Accounts<'_> {
+        resources::Accounts::new(self)
+    }
+
+    /// Access the Issuing Cards resource.
+    pub fn issuing_cards(&self) -> resources::IssuingCards<'_> {
+        resources::IssuingCards::new(self)
+    }
 }
 
 impl Clone for Client {

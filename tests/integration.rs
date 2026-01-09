@@ -33,7 +33,10 @@ use airwallex_rs::{
         BalanceHistoryParams, CreateCustomerRequest, ListBeneficiariesParams,
         ListConversionsParams, ListCustomersParams, ListDepositsParams,
         ListGlobalAccountsParams, ListLinkedAccountsParams, ListPaymentIntentsParams,
-        ListRefundsParams, ListTransfersParams, ListInvoicesParams,
+        ListRefundsParams, ListTransfersParams, ListInvoicesParams, ListPayersParams,
+        ListBatchTransfersParams, ListPaymentMethodsParams, ListPaymentConsentsParams,
+        ListFinancialTransactionsParams, ListPaymentLinksParams, ListPaymentDisputesParams,
+        ListAccountsParams, ListCardsParams,
     },
     Client, Error,
 };
@@ -456,6 +459,294 @@ async fn test_linked_accounts_list() {
         }
         Err(e) => {
             panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Payers
+// ============================================================================
+
+#[tokio::test]
+async fn test_payers_list() {
+    let client = get_client();
+    let params = ListPayersParams::new().page_size(10);
+    let result = client.payers().list(params).await;
+
+    match result {
+        Ok(payers) => {
+            println!("SUCCESS: Got {} payers", payers.items.len());
+            for payer_contact in &payers.items {
+                let entity_type = payer_contact.payer.as_ref().and_then(|p| p.entity_type.as_deref());
+                println!(
+                    "  {:?}: {:?} ({:?})",
+                    payer_contact.id, payer_contact.nickname, entity_type
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: payers:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Batch Transfers
+// ============================================================================
+
+#[tokio::test]
+async fn test_batch_transfers_list() {
+    let client = get_client();
+    let params = ListBatchTransfersParams::new().page_size(10);
+    let result = client.batch_transfers().list(params).await;
+
+    match result {
+        Ok(batches) => {
+            println!("SUCCESS: Got {} batch transfers", batches.items.len());
+            for batch in &batches.items {
+                println!(
+                    "  {:?}: {:?} ({:?})",
+                    batch.id, batch.name, batch.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: batch_transfers:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Payment Methods
+// ============================================================================
+
+#[tokio::test]
+async fn test_payment_methods_list() {
+    let client = get_client();
+    let params = ListPaymentMethodsParams::new().page_size(10);
+    let result = client.payment_methods().list(params).await;
+
+    match result {
+        Ok(methods) => {
+            println!("SUCCESS: Got {} payment methods", methods.items.len());
+            for method in &methods.items {
+                println!(
+                    "  {:?}: {:?} ({:?})",
+                    method.id, method.payment_type, method.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: payment_methods:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Payment Consents
+// ============================================================================
+
+#[tokio::test]
+async fn test_payment_consents_list() {
+    let client = get_client();
+    let params = ListPaymentConsentsParams::new().page_size(10);
+    let result = client.payment_consents().list(params).await;
+
+    match result {
+        Ok(consents) => {
+            println!("SUCCESS: Got {} payment consents", consents.items.len());
+            for consent in &consents.items {
+                println!(
+                    "  {:?}: {:?} ({:?})",
+                    consent.id, consent.next_triggered_by, consent.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: payment_consents:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Financial Transactions
+// ============================================================================
+
+#[tokio::test]
+async fn test_financial_transactions_list() {
+    let client = get_client();
+    let params = ListFinancialTransactionsParams::new().page_size(10);
+    let result = client.financial_transactions().list(params).await;
+
+    match result {
+        Ok(transactions) => {
+            println!("SUCCESS: Got {} financial transactions", transactions.items.len());
+            for txn in &transactions.items {
+                println!(
+                    "  {:?}: {:?} {:?} ({:?})",
+                    txn.id, txn.amount, txn.currency, txn.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: financial_transactions:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Payment Links
+// ============================================================================
+
+#[tokio::test]
+async fn test_payment_links_list() {
+    let client = get_client();
+    let params = ListPaymentLinksParams::new().page_size(10);
+    let result = client.payment_links().list(&params).await;
+
+    match result {
+        Ok(links) => {
+            println!("SUCCESS: Got {} payment links", links.items.len());
+            for link in &links.items {
+                println!(
+                    "  {:?}: {:?} ({:?})",
+                    link.id, link.title, link.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: payment_links:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Payment Disputes
+// ============================================================================
+
+#[tokio::test]
+async fn test_payment_disputes_list() {
+    let client = get_client();
+    let params = ListPaymentDisputesParams::new().size(10);
+    let result = client.payment_disputes().list(&params).await;
+
+    match result {
+        Ok(disputes) => {
+            println!("SUCCESS: Got {} payment disputes", disputes.items.len());
+            for dispute in &disputes.items {
+                println!(
+                    "  {:?}: {:?} {:?} ({:?})",
+                    dispute.id, dispute.amount, dispute.currency, dispute.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: payment_disputes:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Accounts (Scale/Connected Accounts)
+// ============================================================================
+
+#[tokio::test]
+async fn test_accounts_get_own() {
+    let client = get_client();
+    let result = client.accounts().get_own().await;
+
+    match result {
+        Ok(account) => {
+            println!("SUCCESS: Got own account: {:?}", account.id);
+            println!("  Nickname: {:?}", account.nickname);
+            println!("  Status: {:?}", account.status);
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: accounts:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+#[tokio::test]
+async fn test_accounts_list() {
+    let client = get_client();
+    let params = ListAccountsParams::new().page_size(10);
+    let result = client.accounts().list(&params).await;
+
+    match result {
+        Ok(accounts) => {
+            println!("SUCCESS: Got {} connected accounts", accounts.items.len());
+            for account in &accounts.items {
+                println!(
+                    "  {:?}: {:?} ({:?})",
+                    account.id, account.nickname, account.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: accounts:read permission not available (or not a platform)");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Issuing Cards
+// ============================================================================
+
+#[tokio::test]
+async fn test_issuing_cards_list() {
+    let client = get_client();
+    let params = ListCardsParams::new().page_size(10);
+    let result = client.issuing_cards().list(&params).await;
+
+    match result {
+        Ok(cards) => {
+            println!("SUCCESS: Got {} issuing cards", cards.items.len());
+            for card in &cards.items {
+                println!(
+                    "  {:?}: {:?} ({:?})",
+                    card.card_id, card.nick_name, card.card_status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: issuing_cards:read permission not available");
+        }
+        Err(e) => {
+            // Issuing may not be enabled for all accounts
+            let err_str = format!("{:?}", e);
+            if err_str.contains("not enabled") || err_str.contains("forbidden") {
+                println!("SKIPPED: Issuing feature not enabled for this account");
+            } else {
+                panic!("Unexpected error: {:?}", e);
+            }
         }
     }
 }

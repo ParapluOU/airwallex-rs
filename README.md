@@ -61,31 +61,31 @@ let client = Client::new(config)?;
 
 ### Phase 2: Core Resources (22 endpoints)
 
-#### Balances (2)
+#### Balances (2) ✅
 - [x] GET /api/v1/balances/current
-- [ ] GET /api/v1/balances/history
+- [x] GET /api/v1/balances/history
 
-#### Global Accounts (11)
-- [ ] POST /api/v1/global_accounts/create
-- [ ] GET /api/v1/global_accounts
-- [ ] GET /api/v1/global_accounts/{id}
-- [ ] POST /api/v1/global_accounts/{id}/update
-- [ ] POST /api/v1/global_accounts/{id}/close
-- [ ] POST /api/v1/global_accounts/{id}/generate_statement_letter
-- [ ] GET /api/v1/global_accounts/{id}/transactions
-- [ ] + 4 more
+#### Global Accounts (11) ✅
+- [x] POST /api/v1/global_accounts/create
+- [x] GET /api/v1/global_accounts
+- [x] GET /api/v1/global_accounts/{id}
+- [x] POST /api/v1/global_accounts/{id}/update
+- [x] POST /api/v1/global_accounts/{id}/close
+- [x] POST /api/v1/global_accounts/{id}/generate_statement_letter
+- [x] GET /api/v1/global_accounts/{id}/transactions
+- [x] Mandates (list, create, get, cancel)
 
-#### Deposits (1)
-- [ ] GET /api/v1/deposits/{id}
+#### Deposits (1) ✅
+- [x] GET /api/v1/deposits
 
-#### Linked Accounts (13)
-- [ ] POST /api/v1/linked_accounts/create
-- [ ] GET /api/v1/linked_accounts
-- [ ] GET /api/v1/linked_accounts/{id}
-- [ ] POST /api/v1/linked_accounts/{id}/confirm
-- [ ] POST /api/v1/linked_accounts/{id}/suspend
-- [ ] GET /api/v1/linked_accounts/{id}/balances
-- [ ] + 7 more
+#### Linked Accounts (13) ✅
+- [x] POST /api/v1/linked_accounts/create
+- [x] GET /api/v1/linked_accounts
+- [x] GET /api/v1/linked_accounts/{id}
+- [x] POST /api/v1/linked_accounts/{id}/confirm
+- [x] POST /api/v1/linked_accounts/{id}/suspend
+- [x] GET /api/v1/linked_accounts/{id}/balances
+- [x] Auth endpoints, verify microdeposits, mandate, delete
 
 #### Direct Debits (3)
 - [ ] All endpoints
@@ -95,26 +95,22 @@ let client = Client::new(config)?;
 
 ### Phase 3: Payouts & Contacts (34 endpoints)
 
-#### Beneficiaries (7)
-- [ ] POST /api/v1/beneficiaries/create
-- [ ] GET /api/v1/beneficiaries
-- [ ] GET /api/v1/beneficiaries/{id}
-- [ ] POST /api/v1/beneficiaries/{id}/update
-- [ ] POST /api/v1/beneficiaries/{id}/delete
-- [ ] POST /api/v1/beneficiaries/validate
-- [ ] + schema endpoints
+#### Beneficiaries (7) ✅
+- [x] POST /api/v1/beneficiaries/create
+- [x] GET /api/v1/beneficiaries
+- [x] GET /api/v1/beneficiaries/{id}
+- [x] POST /api/v1/beneficiaries/{id}/update
+- [x] POST /api/v1/beneficiaries/{id}/delete
+- [x] POST /api/v1/beneficiaries/validate
+- [x] POST /api/v1/beneficiaries/verify_account
 
 #### Payers (6)
 - [ ] All endpoints
 
-#### Transfers (8)
-- [ ] POST /api/v1/transfers/create
-- [ ] POST /api/v1/transfers/validate
-- [ ] GET /api/v1/transfers
-- [ ] GET /api/v1/transfers/{id}
-- [ ] POST /api/v1/transfers/{id}/cancel
-- [ ] POST /api/v1/transfers/{id}/confirm_funding
-- [ ] + 2 more
+#### Transfers (3) ✅
+- [x] POST /api/v1/transfers/create
+- [x] GET /api/v1/transfers
+- [x] GET /api/v1/transfers/{id}
 
 #### Batch Transfers (9)
 - [ ] POST /api/v1/batch_transfers/create
@@ -132,44 +128,39 @@ let client = Client::new(config)?;
 
 ### Phase 4: Transactional FX (12 endpoints)
 
-#### Rates (1)
-- [ ] GET /api/v1/fx/rates/current
+#### Rates (1) ✅
+- [x] POST /api/v1/rates/quote
 
-#### Quotes (2)
-- [ ] POST /api/v1/fx/quotes/create
-- [ ] GET /api/v1/fx/quotes/{id}
-
-#### Conversions (3)
-- [ ] POST /api/v1/fx/conversions/create
-- [ ] GET /api/v1/fx/conversions
-- [ ] GET /api/v1/fx/conversions/{id}
+#### Conversions (4) ✅
+- [x] POST /api/v1/conversions/create
+- [x] GET /api/v1/conversions
+- [x] GET /api/v1/conversions/{id}
 
 #### Conversion Amendments (4)
-- [ ] POST /api/v1/fx/conversion_amendments/quote
-- [ ] POST /api/v1/fx/conversion_amendments/create
-- [ ] GET /api/v1/fx/conversion_amendments
-- [ ] GET /api/v1/fx/conversion_amendments/{id}
+- [ ] POST /api/v1/conversion_amendments/quote
+- [ ] POST /api/v1/conversion_amendments/create
+- [ ] GET /api/v1/conversion_amendments
+- [ ] GET /api/v1/conversion_amendments/{id}
 
 #### LockFX & MarketFX
 - [ ] Additional FX product endpoints
 
 ### Phase 5: Payment Acceptance (70+ endpoints)
 
-#### Customers (5)
-- [ ] POST /api/v1/pa/customers/create
-- [ ] GET /api/v1/pa/customers
-- [ ] GET /api/v1/pa/customers/{id}
-- [ ] POST /api/v1/pa/customers/{id}/update
-- [ ] POST /api/v1/pa/customers/{id}/generate_client_secret
+#### Customers (5) ✅
+- [x] POST /api/v1/pa/customers/create
+- [x] GET /api/v1/pa/customers
+- [x] GET /api/v1/pa/customers/{id}
+- [x] POST /api/v1/pa/customers/{id}/update
+- [x] GET /api/v1/pa/customers/{id}/generate_client_secret
 
-#### Payment Intents (9)
-- [ ] POST /api/v1/pa/payment_intents/create
-- [ ] GET /api/v1/pa/payment_intents
-- [ ] GET /api/v1/pa/payment_intents/{id}
-- [ ] POST /api/v1/pa/payment_intents/{id}/confirm
-- [ ] POST /api/v1/pa/payment_intents/{id}/capture
-- [ ] POST /api/v1/pa/payment_intents/{id}/cancel
-- [ ] + 3 more
+#### Payment Intents (6) ✅
+- [x] POST /api/v1/pa/payment_intents/create
+- [x] GET /api/v1/pa/payment_intents
+- [x] GET /api/v1/pa/payment_intents/{id}
+- [x] POST /api/v1/pa/payment_intents/{id}/confirm
+- [x] POST /api/v1/pa/payment_intents/{id}/capture
+- [x] POST /api/v1/pa/payment_intents/{id}/cancel
 
 #### Payment Methods (5)
 - [ ] All endpoints
@@ -181,10 +172,10 @@ let client = Client::new(config)?;
 - [ ] GET /api/v1/pa/payment_attempts
 - [ ] GET /api/v1/pa/payment_attempts/{id}
 
-#### Refunds (3)
-- [ ] POST /api/v1/pa/refunds/create
-- [ ] GET /api/v1/pa/refunds
-- [ ] GET /api/v1/pa/refunds/{id}
+#### Refunds (3) ✅
+- [x] POST /api/v1/pa/refunds/create
+- [x] GET /api/v1/pa/refunds
+- [x] GET /api/v1/pa/refunds/{id}
 
 #### Payment Disputes (5)
 - [ ] All endpoints
@@ -314,8 +305,12 @@ let client = Client::new(config)?;
 #### Prices (4)
 - [ ] All endpoints
 
-#### Invoices (5)
-- [ ] All endpoints
+#### Invoices (5) ✅
+- [x] GET /api/v1/invoices
+- [x] GET /api/v1/invoices/{id}
+- [x] GET /api/v1/invoices/{id}/items
+- [x] GET /api/v1/invoices/{id}/items/{item_id}
+- [x] POST /api/v1/invoices/preview
 
 #### Subscriptions (7)
 - [ ] All endpoints
@@ -457,23 +452,39 @@ let client = Client::new(config)?;
 
 ## API Coverage Summary
 
-| Domain | Endpoints | Status |
-|--------|-----------|--------|
-| Foundation | N/A | Complete |
-| Core Resources | 22 | Partial |
-| Payouts & Contacts | 34 | Not started |
-| Transactional FX | 12 | Not started |
-| Payment Acceptance | 70+ | Not started |
-| Issuing | 33 | Not started |
-| Scale | 50+ | Not started |
-| Billing | 21 | Not started |
-| Spend Management | 19 | Not started |
-| Risk & Compliance | 11 | Not started |
-| Partner & Lending | 20+ | Not started |
-| Finance & Reconciliation | 15 | Not started |
-| Supporting Services | 30+ | Not started |
-| Simulation (Sandbox) | 26 | Not started |
-| **Total** | **371** | **~1%** |
+| Domain | Endpoints | Implemented | Status |
+|--------|-----------|-------------|--------|
+| Foundation | N/A | N/A | ✅ Complete |
+| Core Resources | 22 | 27 | ✅ Complete |
+| Payouts & Contacts | 34 | 10 | Partial |
+| Transactional FX | 12 | 4 | Partial |
+| Payment Acceptance | 70+ | 14 | Partial |
+| Issuing | 33 | 0 | Not started |
+| Scale | 50+ | 0 | Not started |
+| Billing | 21 | 5 | Partial |
+| Spend Management | 19 | 0 | Not started |
+| Risk & Compliance | 11 | 0 | Not started |
+| Partner & Lending | 20+ | 0 | Not started |
+| Finance & Reconciliation | 15 | 0 | Not started |
+| Supporting Services | 30+ | 1 | Partial (auth) |
+| Simulation (Sandbox) | 26 | 0 | Not started |
+| **Total** | **371** | **~60** | **~16%** |
+
+## Implemented Resources
+
+The following resources are fully implemented with typed models:
+
+- **Balances** - Current and history
+- **Global Accounts** - Full CRUD, transactions, mandates, statement letters
+- **Deposits** - List deposits
+- **Linked Accounts** - Full CRUD, auth flows, microdeposit verification
+- **Beneficiaries** - Full CRUD, validation, account verification
+- **Transfers** - Create, list, get
+- **Conversions** - Create, list, get, rate quotes
+- **Customers** - Full CRUD, client secret generation
+- **Payment Intents** - Create, list, get, confirm, capture, cancel
+- **Invoices** - List, get, items, preview
+- **Refunds** - Create, list, get
 
 ## License
 

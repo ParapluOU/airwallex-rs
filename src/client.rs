@@ -117,6 +117,50 @@ impl Client {
         self.request(reqwest::Method::POST, path, Some(body)).await
     }
 
+    /// Make a POST request with an empty body.
+    pub async fn post_empty<T: DeserializeOwned>(&self, path: &str) -> Result<T> {
+        let token = self.token_manager.get_token().await?;
+        let url = format!("{}{}", self.config.base_url(), path);
+
+        let mut request = self
+            .http_client
+            .post(&url)
+            .header(AUTHORIZATION, token.bearer_value())
+            .header(CONTENT_TYPE, "application/json")
+            .header("x-api-version", &self.config.api_version)
+            .header("Content-Length", "0")
+            .body("");
+
+        if let Some(account_id) = &self.config.on_behalf_of {
+            request = request.header("x-on-behalf-of", account_id);
+        }
+
+        let response = request.send().await?;
+        self.handle_response(response).await
+    }
+
+    /// Make a POST request with empty body and no response body.
+    pub async fn post_empty_no_response(&self, path: &str) -> Result<()> {
+        let token = self.token_manager.get_token().await?;
+        let url = format!("{}{}", self.config.base_url(), path);
+
+        let mut request = self
+            .http_client
+            .post(&url)
+            .header(AUTHORIZATION, token.bearer_value())
+            .header(CONTENT_TYPE, "application/json")
+            .header("x-api-version", &self.config.api_version)
+            .header("Content-Length", "0")
+            .body("");
+
+        if let Some(account_id) = &self.config.on_behalf_of {
+            request = request.header("x-on-behalf-of", account_id);
+        }
+
+        let response = request.send().await?;
+        self.handle_empty_response(response).await
+    }
+
     /// Make a POST request without expecting a response body.
     pub async fn post_no_response<B: Serialize>(&self, path: &str, body: &B) -> Result<()> {
         let token = self.token_manager.get_token().await?;
@@ -240,6 +284,56 @@ impl Client {
     /// Access the Balances resource.
     pub fn balances(&self) -> resources::Balances<'_> {
         resources::Balances::new(self)
+    }
+
+    /// Access the Global Accounts resource.
+    pub fn global_accounts(&self) -> resources::GlobalAccounts<'_> {
+        resources::GlobalAccounts::new(self)
+    }
+
+    /// Access the Deposits resource.
+    pub fn deposits(&self) -> resources::Deposits<'_> {
+        resources::Deposits::new(self)
+    }
+
+    /// Access the Beneficiaries resource.
+    pub fn beneficiaries(&self) -> resources::Beneficiaries<'_> {
+        resources::Beneficiaries::new(self)
+    }
+
+    /// Access the Transfers resource.
+    pub fn transfers(&self) -> resources::Transfers<'_> {
+        resources::Transfers::new(self)
+    }
+
+    /// Access the Linked Accounts resource.
+    pub fn linked_accounts(&self) -> resources::LinkedAccounts<'_> {
+        resources::LinkedAccounts::new(self)
+    }
+
+    /// Access the Invoices resource.
+    pub fn invoices(&self) -> resources::Invoices<'_> {
+        resources::Invoices::new(self)
+    }
+
+    /// Access the Payment Intents resource.
+    pub fn payment_intents(&self) -> resources::PaymentIntents<'_> {
+        resources::PaymentIntents::new(self)
+    }
+
+    /// Access the Conversions (FX) resource.
+    pub fn conversions(&self) -> resources::Conversions<'_> {
+        resources::Conversions::new(self)
+    }
+
+    /// Access the Customers resource.
+    pub fn customers(&self) -> resources::Customers<'_> {
+        resources::Customers::new(self)
+    }
+
+    /// Access the Refunds resource.
+    pub fn refunds(&self) -> resources::Refunds<'_> {
+        resources::Refunds::new(self)
     }
 }
 

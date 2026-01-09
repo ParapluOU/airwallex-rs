@@ -29,6 +29,9 @@ pub mod issuing_transaction_disputes;
 pub mod issuing_config;
 pub mod account_capabilities;
 pub mod payment_attempts;
+pub mod payment_config;
+pub mod reference_data;
+pub mod reconciliation;
 pub mod connected_account_transfers;
 pub mod conversion_amendments;
 
@@ -61,5 +64,8 @@ pub use issuing_transaction_disputes::*;
 pub use issuing_config::*;
 pub use account_capabilities::*;
 pub use payment_attempts::*;
+pub use payment_config::*;
+pub use reference_data::*;
+pub use reconciliation::*;
 pub use connected_account_transfers::*;
 pub use conversion_amendments::*;

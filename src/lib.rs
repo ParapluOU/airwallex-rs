@@ -60,6 +60,7 @@ pub mod config;
 pub mod error;
 pub mod models;
 pub mod resources;
+pub mod webhooks;
 
 // Re-export main types at crate root
 pub use client::Client;

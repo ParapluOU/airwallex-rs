@@ -421,6 +421,21 @@ impl Client {
         resources::PaymentAttempts::new(self)
     }
 
+    /// Access the Payment Config resource.
+    pub fn payment_config(&self) -> resources::PaymentConfig<'_> {
+        resources::PaymentConfig::new(self)
+    }
+
+    /// Access the Reference Data resource.
+    pub fn reference_data(&self) -> resources::ReferenceData<'_> {
+        resources::ReferenceData::new(self)
+    }
+
+    /// Access the Reconciliation resource.
+    pub fn reconciliation(&self) -> resources::Reconciliation<'_> {
+        resources::Reconciliation::new(self)
+    }
+
     /// Access the Connected Account Transfers resource.
     pub fn connected_account_transfers(&self) -> resources::ConnectedAccountTransfers<'_> {
         resources::ConnectedAccountTransfers::new(self)

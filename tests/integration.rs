@@ -38,6 +38,7 @@ use airwallex_rs::{
         ListFinancialTransactionsParams, ListPaymentLinksParams, ListPaymentDisputesParams,
         ListAccountsParams, ListCardsParams, ListCardholdersParams, ListIssuingTransactionsParams,
         ListIssuingAuthorizationsParams, ListConnectedAccountTransfersParams, GetFxRateParams,
+        ListPaymentAttemptsParams, ListSettlementsParams, ListIssuingTransactionDisputesParams,
     },
     Client, Error,
 };
@@ -910,6 +911,159 @@ async fn test_fx_get_rate() {
         }
         Err(e) => {
             panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Payment Attempts
+// ============================================================================
+
+#[tokio::test]
+async fn test_payment_attempts_list() {
+    let client = get_client();
+    let params = ListPaymentAttemptsParams::new().page_size(10);
+    let result = client.payment_attempts().list(&params).await;
+
+    match result {
+        Ok(attempts) => {
+            println!("SUCCESS: Got {} payment attempts", attempts.items.len());
+            for attempt in &attempts.items {
+                println!(
+                    "  {:?}: {:?} {:?} ({:?})",
+                    attempt.id, attempt.amount, attempt.currency, attempt.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: payment_attempts:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Settlements
+// ============================================================================
+
+#[tokio::test]
+async fn test_settlements_list() {
+    let client = get_client();
+    // Settlements require date range in ISO date format (YYYY-MM-DD)
+    let params = ListSettlementsParams::new(
+        "USD",
+        "SETTLED",
+        "2024-01-01",
+        "2025-12-31",
+    ).page_size(10);
+    let result = client.settlements().list(&params).await;
+
+    match result {
+        Ok(settlements) => {
+            println!("SUCCESS: Got {} settlements", settlements.items.len());
+            for settlement in &settlements.items {
+                println!(
+                    "  {:?}: {:?} {:?} ({:?})",
+                    settlement.id, settlement.amount, settlement.currency, settlement.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: settlements:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Issuing Transaction Disputes
+// ============================================================================
+
+#[tokio::test]
+async fn test_issuing_transaction_disputes_list() {
+    let client = get_client();
+    let params = ListIssuingTransactionDisputesParams::new().page_size(10);
+    let result = client.issuing_transaction_disputes().list(&params).await;
+
+    match result {
+        Ok(disputes) => {
+            println!("SUCCESS: Got {} issuing transaction disputes", disputes.items.len());
+            for dispute in &disputes.items {
+                println!(
+                    "  {:?}: {:?} ({:?})",
+                    dispute.id, dispute.amount, dispute.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: issuing_transaction_disputes:read permission not available");
+        }
+        Err(e) => {
+            let err_str = format!("{:?}", e);
+            if err_str.contains("not enabled") || err_str.contains("forbidden") {
+                println!("SKIPPED: Issuing feature not enabled for this account");
+            } else {
+                panic!("Unexpected error: {:?}", e);
+            }
+        }
+    }
+}
+
+// ============================================================================
+// Reference Data
+// ============================================================================
+
+#[tokio::test]
+async fn test_reference_data_currencies() {
+    let client = get_client();
+    let result = client.reference_data().supported_currencies().await;
+
+    match result {
+        Ok(currencies) => {
+            println!("SUCCESS: Got supported currencies");
+            if let Some(conversion) = &currencies.conversion {
+                println!("  Buy currencies: {:?}", conversion.buy_currencies);
+                println!("  Sell currencies: {:?}", conversion.sell_currencies);
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: reference_data:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Issuing Config
+// ============================================================================
+
+#[tokio::test]
+async fn test_issuing_config_get() {
+    let client = get_client();
+    let result = client.issuing_config().get().await;
+
+    match result {
+        Ok(config) => {
+            println!("SUCCESS: Got issuing config");
+            println!("  Remote auth settings: {:?}", config.remote_auth_settings.is_some());
+            println!("  Spending limit settings: {:?}", config.spending_limit_settings.is_some());
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: issuing_config:read permission not available");
+        }
+        Err(e) => {
+            let err_str = format!("{:?}", e);
+            if err_str.contains("not enabled") || err_str.contains("forbidden") {
+                println!("SKIPPED: Issuing feature not enabled for this account");
+            } else {
+                panic!("Unexpected error: {:?}", e);
+            }
         }
     }
 }

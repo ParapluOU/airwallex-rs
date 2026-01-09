@@ -34,6 +34,7 @@ Set environment variables:
 - `AIRWALLEX_CLIENT_ID` or `AIRWALLEX_SANDBOX_CLIENT_ID` - Your API client ID
 - `AIRWALLEX_API_KEY` or `AIRWALLEX_SANDBOX_API_KEY` - Your API key
 - `AIRWALLEX_ENVIRONMENT` - `sandbox` or `production` (default: `sandbox`)
+- `AIRWALLEX_LOGIN_AS` or `AIRWALLEX_SANDBOX_LOGIN_AS` - (Optional) Account ID for scoped API keys with multi-account access
 
 Or configure programmatically:
 
@@ -44,6 +45,8 @@ let config = Config::builder()
     .client_id("your_client_id")
     .api_key("your_api_key")
     .environment(Environment::Sandbox)
+    // For scoped API keys with multi-account access:
+    // .login_as("your_account_id")
     .build()?;
 
 let client = Client::new(config)?;

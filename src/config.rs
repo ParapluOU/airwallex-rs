@@ -67,6 +67,8 @@ pub struct Config {
     pub(crate) token_refresh_buffer: Duration,
     /// Optional account ID for connected account operations.
     pub(crate) on_behalf_of: Option<String>,
+    /// Optional account ID to log in as (for scoped API keys with multi-account access).
+    pub(crate) login_as: Option<String>,
 }
 
 impl std::fmt::Debug for Config {
@@ -79,6 +81,7 @@ impl std::fmt::Debug for Config {
             .field("timeout", &self.timeout)
             .field("token_refresh_buffer", &self.token_refresh_buffer)
             .field("on_behalf_of", &self.on_behalf_of)
+            .field("login_as", &self.login_as)
             .finish()
     }
 }
@@ -124,11 +127,21 @@ impl Config {
                 env_prefix
             )))?;
 
-        Ok(Config::builder()
+        // Optional: account ID to log in as (for scoped API keys with multi-account access)
+        let login_as = std::env::var(format!("{}_LOGIN_AS", env_prefix))
+            .or_else(|_| std::env::var("AIRWALLEX_LOGIN_AS"))
+            .ok();
+
+        let mut builder = Config::builder()
             .client_id(client_id)
             .api_key(api_key)
-            .environment(environment)
-            .build()?)
+            .environment(environment);
+
+        if let Some(account_id) = login_as {
+            builder = builder.login_as(account_id);
+        }
+
+        Ok(builder.build()?)
     }
 
     /// Get the base URL for the configured environment.
@@ -152,6 +165,7 @@ pub struct ConfigBuilder {
     timeout: Option<Duration>,
     token_refresh_buffer: Option<Duration>,
     on_behalf_of: Option<String>,
+    login_as: Option<String>,
 }
 
 impl ConfigBuilder {
@@ -197,6 +211,16 @@ impl ConfigBuilder {
         self
     }
 
+    /// Set the account ID to log in as (for scoped API keys with multi-account access).
+    ///
+    /// If your scoped API key has access to multiple accounts or both organization-level
+    /// and account-level resources, use this to specify which account the token should
+    /// be authorized for. Without this, the token defaults to organization-level access only.
+    pub fn login_as(mut self, account_id: impl Into<String>) -> Self {
+        self.login_as = Some(account_id.into());
+        self
+    }
+
     /// Build the configuration.
     pub fn build(self) -> Result<Config> {
         let client_id = self
@@ -215,6 +239,7 @@ impl ConfigBuilder {
             timeout: self.timeout.unwrap_or(DEFAULT_TIMEOUT),
             token_refresh_buffer: self.token_refresh_buffer.unwrap_or(DEFAULT_TOKEN_REFRESH_BUFFER),
             on_behalf_of: self.on_behalf_of,
+            login_as: self.login_as,
         })
     }
 }

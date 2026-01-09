@@ -99,16 +99,20 @@ impl TokenManager {
     async fn login(&self) -> Result<Token> {
         let url = format!("{}/api/v1/authentication/login", self.config.base_url());
 
-        let response = self
+        let mut request = self
             .http_client
             .post(&url)
             .header("x-client-id", &self.config.client_id)
             .header("x-api-key", self.config.api_key())
             .header("Content-Type", "application/json")
-            .header("Content-Length", "0")
-            .body("")
-            .send()
-            .await?;
+            .header("Content-Length", "0");
+
+        // Add x-login-as header if configured (for scoped API keys with multi-account access)
+        if let Some(account_id) = &self.config.login_as {
+            request = request.header("x-login-as", account_id);
+        }
+
+        let response = request.body("").send().await?;
 
         let status = response.status();
 

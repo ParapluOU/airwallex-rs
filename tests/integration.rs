@@ -2,9 +2,15 @@
 //!
 //! These tests require valid sandbox credentials in environment variables:
 //! - AIRWALLEX_SANDBOX_CLIENT_ID or AIRWALLEX_CLIENT_ID
-//! - AIRWALLEX_SANDBOX_API_KEY or AIRWALLEX_SANDBOX_API_KEY
+//! - AIRWALLEX_SANDBOX_API_KEY or AIRWALLEX_API_KEY
+//! - AIRWALLEX_SANDBOX_LOGIN_AS or AIRWALLEX_LOGIN_AS (for scoped API keys with multi-account access)
 //!
 //! Run with: cargo test --test integration
+//!
+//! NOTE: If your scoped API key has access to multiple accounts or both organization-level
+//! and account-level resources, you MUST set AIRWALLEX_SANDBOX_LOGIN_AS to your account ID.
+//! Without this, the token defaults to organization-level access and account-level APIs
+//! (like balances, customers, etc.) will fail with "Insufficient permissions".
 //!
 //! NOTE: Many tests require specific API key permissions in the Airwallex dashboard.
 //! Tests will be skipped if the required permissions are not available.

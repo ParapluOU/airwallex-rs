@@ -1,0 +1,453 @@
+//! Integration tests against the Airwallex sandbox API.
+//!
+//! These tests require valid sandbox credentials in environment variables:
+//! - AIRWALLEX_SANDBOX_CLIENT_ID or AIRWALLEX_CLIENT_ID
+//! - AIRWALLEX_SANDBOX_API_KEY or AIRWALLEX_SANDBOX_API_KEY
+//!
+//! Run with: cargo test --test integration
+//!
+//! NOTE: Many tests require specific API key permissions in the Airwallex dashboard.
+//! Tests will be skipped if the required permissions are not available.
+//!
+//! To enable all tests, ensure your API key has these scopes:
+//! - balances:read
+//! - global_accounts:read, global_accounts:write
+//! - beneficiaries:read, beneficiaries:write
+//! - transfers:read, transfers:write
+//! - conversions:read, conversions:write
+//! - customers:read, customers:write
+//! - payment_intents:read, payment_intents:write
+//! - refunds:read, refunds:write
+//! - invoices:read
+//! - linked_accounts:read
+//! - deposits:read
+
+use airwallex_rs::{
+    models::{
+        BalanceHistoryParams, CreateCustomerRequest, ListBeneficiariesParams,
+        ListConversionsParams, ListCustomersParams, ListDepositsParams,
+        ListGlobalAccountsParams, ListLinkedAccountsParams, ListPaymentIntentsParams,
+        ListRefundsParams, ListTransfersParams, ListInvoicesParams,
+    },
+    Client, Error,
+};
+
+fn get_client() -> Client {
+    dotenvy::dotenv().ok();
+    Client::from_env().expect("Failed to create client from environment - check AIRWALLEX_SANDBOX_CLIENT_ID and AIRWALLEX_SANDBOX_API_KEY")
+}
+
+/// Check if an error is a permissions error (vs auth failure or other errors)
+fn is_permission_error(e: &Error) -> bool {
+    let err_str = format!("{:?}", e);
+    err_str.contains("Insufficient permissions") || err_str.contains("unauthorized")
+}
+
+/// Check if an error is a real auth failure
+fn is_auth_failure(e: &Error) -> bool {
+    let err_str = format!("{:?}", e);
+    err_str.contains("credentials_invalid") || err_str.contains("credentials_expired")
+}
+
+// ============================================================================
+// Authentication - This test MUST pass
+// ============================================================================
+
+#[tokio::test]
+async fn test_authentication_works() {
+    let client = get_client();
+    // Try to make any authenticated request
+    let result = client.balances().current().await;
+
+    match result {
+        Ok(_) => {
+            // Great, we have full access
+        }
+        Err(ref e) if is_permission_error(e) => {
+            // Permission error means auth worked, just lacking scope
+        }
+        Err(ref e) if is_auth_failure(e) => {
+            panic!("Authentication failed - check your API credentials: {:?}", e);
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Balances
+// ============================================================================
+
+#[tokio::test]
+async fn test_balances_current() {
+    let client = get_client();
+    let result = client.balances().current().await;
+
+    match result {
+        Ok(balances) => {
+            println!("SUCCESS: Got {} balance entries", balances.items.len());
+            for balance in &balances.items {
+                println!("  {}: available={}", balance.currency, balance.available_amount);
+            }
+            // Verify response structure
+            assert!(balances.items.iter().all(|b| !b.currency.is_empty()));
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: balances:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+#[tokio::test]
+async fn test_balances_history() {
+    let client = get_client();
+    let params = BalanceHistoryParams::new().page_size(10);
+    let result = client.balances().history(params).await;
+
+    match result {
+        Ok(history) => {
+            println!("SUCCESS: Got {} history entries", history.items.len());
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: balances:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Global Accounts
+// ============================================================================
+
+#[tokio::test]
+async fn test_global_accounts_list() {
+    let client = get_client();
+    let params = ListGlobalAccountsParams::new().page_size(10);
+    let result = client.global_accounts().list(params).await;
+
+    match result {
+        Ok(accounts) => {
+            println!("SUCCESS: Got {} global accounts", accounts.items.len());
+            for account in &accounts.items {
+                println!(
+                    "  {}: {} {} ({})",
+                    account.id, account.currency, account.country_code, account.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: global_accounts:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Beneficiaries
+// ============================================================================
+
+#[tokio::test]
+async fn test_beneficiaries_list() {
+    let client = get_client();
+    let params = ListBeneficiariesParams::new().page_size(10);
+    let result = client.beneficiaries().list(params).await;
+
+    match result {
+        Ok(beneficiaries) => {
+            println!("SUCCESS: Got {} beneficiaries", beneficiaries.items.len());
+            for ben in &beneficiaries.items {
+                println!("  {:?}: {:?} {:?}", ben.id, ben.first_name, ben.last_name);
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: beneficiaries:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Transfers
+// ============================================================================
+
+#[tokio::test]
+async fn test_transfers_list() {
+    let client = get_client();
+    let params = ListTransfersParams::new().page_size(10);
+    let result = client.transfers().list(params).await;
+
+    match result {
+        Ok(transfers) => {
+            println!("SUCCESS: Got {} transfers", transfers.items.len());
+            for transfer in &transfers.items {
+                println!(
+                    "  {:?}: {:?} {:?} -> {:?}",
+                    transfer.id, transfer.source_amount, transfer.source_currency, transfer.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: transfers:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Conversions
+// ============================================================================
+
+#[tokio::test]
+async fn test_conversions_list() {
+    let client = get_client();
+    let params = ListConversionsParams::new().page_size(10);
+    let result = client.conversions().list(params).await;
+
+    match result {
+        Ok(conversions) => {
+            println!("SUCCESS: Got {} conversions", conversions.items.len());
+            for conv in &conversions.items {
+                println!(
+                    "  {:?}: {:?} {:?} -> {:?} {:?}",
+                    conv.conversion_id,
+                    conv.sell_amount,
+                    conv.sell_currency,
+                    conv.buy_amount,
+                    conv.buy_currency
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: conversions:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Customers (Payment Acceptance)
+// ============================================================================
+
+#[tokio::test]
+async fn test_customers_list() {
+    let client = get_client();
+    let params = ListCustomersParams::new().page_size(10);
+    let result = client.customers().list(params).await;
+
+    match result {
+        Ok(customers) => {
+            println!("SUCCESS: Got {} customers", customers.items.len());
+            for cust in &customers.items {
+                println!("  {:?}: {:?} {:?}", cust.id, cust.first_name, cust.email);
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: customers:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+#[tokio::test]
+async fn test_customer_create_and_get() {
+    let client = get_client();
+
+    let request_id = format!("test-{}", uuid::Uuid::new_v4());
+    let request = CreateCustomerRequest::new(&request_id)
+        .first_name("Test")
+        .last_name("Customer")
+        .email("test@example.com");
+
+    let result = client.customers().create(request).await;
+
+    match result {
+        Ok(customer) => {
+            println!("SUCCESS: Created customer: {:?}", customer.id);
+            assert!(customer.id.is_some());
+            assert_eq!(customer.first_name.as_deref(), Some("Test"));
+            assert_eq!(customer.last_name.as_deref(), Some("Customer"));
+
+            // Now fetch it
+            if let Some(id) = &customer.id {
+                let get_result = client.customers().get(id).await;
+                match get_result {
+                    Ok(fetched) => {
+                        assert_eq!(fetched.id, customer.id);
+                        println!("SUCCESS: Fetched customer matches created customer");
+                    }
+                    Err(e) => panic!("Failed to fetch created customer: {:?}", e),
+                }
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: customers:write permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Payment Intents
+// ============================================================================
+
+#[tokio::test]
+async fn test_payment_intents_list() {
+    let client = get_client();
+    let params = ListPaymentIntentsParams::new().page_size(10);
+    let result = client.payment_intents().list(params).await;
+
+    match result {
+        Ok(intents) => {
+            println!("SUCCESS: Got {} payment intents", intents.items.len());
+            for intent in &intents.items {
+                println!(
+                    "  {:?}: {:?} {:?} ({})",
+                    intent.id,
+                    intent.amount,
+                    intent.currency,
+                    intent.status.as_deref().unwrap_or("unknown")
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: payment_intents:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Invoices
+// ============================================================================
+
+#[tokio::test]
+async fn test_invoices_list() {
+    let client = get_client();
+    let params = ListInvoicesParams::new().page_size(10);
+    let result = client.invoices().list(params).await;
+
+    match result {
+        Ok(invoices) => {
+            println!("SUCCESS: Got {} invoices", invoices.items.len());
+            for invoice in &invoices.items {
+                println!("  {:?}: {:?} {:?}", invoice.id, invoice.currency, invoice.status);
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: invoices:read permission not available");
+        }
+        Err(e) => {
+            // Special case: this endpoint has API version requirements
+            let err_str = format!("{:?}", e);
+            if err_str.contains("API version") {
+                println!("SKIPPED: invoices endpoint requires different API version");
+            } else {
+                panic!("Unexpected error: {:?}", e);
+            }
+        }
+    }
+}
+
+// ============================================================================
+// Refunds
+// ============================================================================
+
+#[tokio::test]
+async fn test_refunds_list() {
+    let client = get_client();
+    let params = ListRefundsParams::new().page_size(10);
+    let result = client.refunds().list(params).await;
+
+    match result {
+        Ok(refunds) => {
+            println!("SUCCESS: Got {} refunds", refunds.items.len());
+            for refund in &refunds.items {
+                println!("  {:?}: {:?} {:?}", refund.id, refund.amount, refund.status);
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: refunds:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Deposits
+// ============================================================================
+
+#[tokio::test]
+async fn test_deposits_list() {
+    let client = get_client();
+    let params = ListDepositsParams::new().page_size(10);
+    let result = client.deposits().list(params).await;
+
+    match result {
+        Ok(deposits) => {
+            println!("SUCCESS: Got {} deposits", deposits.items.len());
+            for deposit in &deposits.items {
+                println!(
+                    "  {:?}: {:?} {}",
+                    deposit.deposit_id, deposit.amount, deposit.currency
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: deposits:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}
+
+// ============================================================================
+// Linked Accounts
+// ============================================================================
+
+#[tokio::test]
+async fn test_linked_accounts_list() {
+    let client = get_client();
+    let params = ListLinkedAccountsParams::new().page_size(10);
+    let result = client.linked_accounts().list(params).await;
+
+    match result {
+        Ok(accounts) => {
+            println!("SUCCESS: Got {} linked accounts", accounts.items.len());
+            for account in &accounts.items {
+                println!(
+                    "  {}: {} ({})",
+                    account.id, account.account_type, account.status
+                );
+            }
+        }
+        Err(ref e) if is_permission_error(e) => {
+            println!("SKIPPED: linked_accounts:read permission not available");
+        }
+        Err(e) => {
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+}

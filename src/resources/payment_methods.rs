@@ -36,7 +36,10 @@ impl<'a> PaymentMethods<'a> {
     /// # API Reference
     ///
     /// `GET /api/v1/pa/payment_methods`
-    pub async fn list(&self, params: ListPaymentMethodsParams) -> Result<ListPaymentMethodsResponse> {
+    pub async fn list(
+        &self,
+        params: ListPaymentMethodsParams,
+    ) -> Result<ListPaymentMethodsResponse> {
         self.client
             .get_with_query("/api/v1/pa/payment_methods", &params)
             .await
@@ -66,7 +69,10 @@ impl<'a> PaymentMethods<'a> {
         request: DisablePaymentMethodRequest,
     ) -> Result<PaymentMethod> {
         self.client
-            .post(&format!("/api/v1/pa/payment_methods/{}/disable", id), &request)
+            .post(
+                &format!("/api/v1/pa/payment_methods/{}/disable", id),
+                &request,
+            )
             .await
     }
 }

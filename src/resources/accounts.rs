@@ -30,9 +30,7 @@ impl<'a> Accounts<'a> {
 
     /// List connected accounts.
     pub async fn list(&self, params: &ListAccountsParams) -> Result<ListAccountsResponse> {
-        self.client
-            .get_with_query("/api/v1/accounts", params)
-            .await
+        self.client.get_with_query("/api/v1/accounts", params).await
     }
 
     /// Get a connected account by ID.

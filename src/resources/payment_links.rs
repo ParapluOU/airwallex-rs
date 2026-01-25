@@ -21,7 +21,9 @@ impl<'a> PaymentLinks<'a> {
 
     /// Create a new payment link.
     pub async fn create(&self, request: &CreatePaymentLinkRequest) -> Result<PaymentLink> {
-        self.client.post("/api/v1/pa/payment_links/create", request).await
+        self.client
+            .post("/api/v1/pa/payment_links/create", request)
+            .await
     }
 
     /// List payment links.
@@ -39,7 +41,11 @@ impl<'a> PaymentLinks<'a> {
     }
 
     /// Update a payment link.
-    pub async fn update(&self, id: &str, request: &UpdatePaymentLinkRequest) -> Result<PaymentLink> {
+    pub async fn update(
+        &self,
+        id: &str,
+        request: &UpdatePaymentLinkRequest,
+    ) -> Result<PaymentLink> {
         self.client
             .post(&format!("/api/v1/pa/payment_links/{}/update", id), request)
             .await
@@ -62,7 +68,10 @@ impl<'a> PaymentLinks<'a> {
     /// Send notification to shopper about payment link.
     pub async fn notify_shopper(&self, id: &str, request: &NotifyShopperRequest) -> Result<()> {
         self.client
-            .post_no_response(&format!("/api/v1/pa/payment_links/{}/notify_shopper", id), request)
+            .post_no_response(
+                &format!("/api/v1/pa/payment_links/{}/notify_shopper", id),
+                request,
+            )
             .await
     }
 

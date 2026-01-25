@@ -58,7 +58,10 @@ impl<'a> Invoices<'a> {
     /// `GET /api/v1/invoices/{id}/items/{item_id}`
     pub async fn get_item(&self, invoice_id: &str, item_id: &str) -> Result<InvoiceItem> {
         self.client
-            .get(&format!("/api/v1/invoices/{}/items/{}", invoice_id, item_id))
+            .get(&format!(
+                "/api/v1/invoices/{}/items/{}",
+                invoice_id, item_id
+            ))
             .await
     }
 
@@ -68,8 +71,6 @@ impl<'a> Invoices<'a> {
     ///
     /// `POST /api/v1/invoices/preview`
     pub async fn preview(&self, request: InvoicePreviewRequest) -> Result<InvoicePreviewResponse> {
-        self.client
-            .post("/api/v1/invoices/preview", &request)
-            .await
+        self.client.post("/api/v1/invoices/preview", &request).await
     }
 }

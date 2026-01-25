@@ -115,17 +115,21 @@ impl Config {
 
         let client_id = std::env::var(format!("{}_CLIENT_ID", env_prefix))
             .or_else(|_| std::env::var("AIRWALLEX_CLIENT_ID"))
-            .map_err(|_| Error::Env(format!(
-                "Neither {}_CLIENT_ID nor AIRWALLEX_CLIENT_ID is set",
-                env_prefix
-            )))?;
+            .map_err(|_| {
+                Error::Env(format!(
+                    "Neither {}_CLIENT_ID nor AIRWALLEX_CLIENT_ID is set",
+                    env_prefix
+                ))
+            })?;
 
         let api_key = std::env::var(format!("{}_API_KEY", env_prefix))
             .or_else(|_| std::env::var("AIRWALLEX_API_KEY"))
-            .map_err(|_| Error::Env(format!(
-                "Neither {}_API_KEY nor AIRWALLEX_API_KEY is set",
-                env_prefix
-            )))?;
+            .map_err(|_| {
+                Error::Env(format!(
+                    "Neither {}_API_KEY nor AIRWALLEX_API_KEY is set",
+                    env_prefix
+                ))
+            })?;
 
         // Optional: account ID to log in as (for scoped API keys with multi-account access)
         let login_as = std::env::var(format!("{}_LOGIN_AS", env_prefix))
@@ -235,9 +239,13 @@ impl ConfigBuilder {
             client_id,
             api_key,
             environment: self.environment,
-            api_version: self.api_version.unwrap_or_else(|| DEFAULT_API_VERSION.to_string()),
+            api_version: self
+                .api_version
+                .unwrap_or_else(|| DEFAULT_API_VERSION.to_string()),
             timeout: self.timeout.unwrap_or(DEFAULT_TIMEOUT),
-            token_refresh_buffer: self.token_refresh_buffer.unwrap_or(DEFAULT_TOKEN_REFRESH_BUFFER),
+            token_refresh_buffer: self
+                .token_refresh_buffer
+                .unwrap_or(DEFAULT_TOKEN_REFRESH_BUFFER),
             on_behalf_of: self.on_behalf_of,
             login_as: self.login_as,
         })
@@ -250,10 +258,22 @@ mod tests {
 
     #[test]
     fn test_environment_from_str() {
-        assert_eq!("sandbox".parse::<Environment>().unwrap(), Environment::Sandbox);
-        assert_eq!("production".parse::<Environment>().unwrap(), Environment::Production);
-        assert_eq!("SANDBOX".parse::<Environment>().unwrap(), Environment::Sandbox);
-        assert_eq!("prod".parse::<Environment>().unwrap(), Environment::Production);
+        assert_eq!(
+            "sandbox".parse::<Environment>().unwrap(),
+            Environment::Sandbox
+        );
+        assert_eq!(
+            "production".parse::<Environment>().unwrap(),
+            Environment::Production
+        );
+        assert_eq!(
+            "SANDBOX".parse::<Environment>().unwrap(),
+            Environment::Sandbox
+        );
+        assert_eq!(
+            "prod".parse::<Environment>().unwrap(),
+            Environment::Production
+        );
     }
 
     #[test]

@@ -59,7 +59,10 @@ impl<'a> ConversionAmendments<'a> {
     /// `GET /api/v1/fx/conversion_amendments/{conversion_amendment_id}`
     pub async fn get(&self, amendment_id: &str) -> Result<ConversionAmendment> {
         self.client
-            .get(&format!("/api/v1/fx/conversion_amendments/{}", amendment_id))
+            .get(&format!(
+                "/api/v1/fx/conversion_amendments/{}",
+                amendment_id
+            ))
             .await
     }
 }

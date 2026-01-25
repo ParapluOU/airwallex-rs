@@ -37,7 +37,10 @@ impl<'a> BatchTransfers<'a> {
     /// # API Reference
     ///
     /// `GET /api/v1/batch_transfers`
-    pub async fn list(&self, params: ListBatchTransfersParams) -> Result<ListBatchTransfersResponse> {
+    pub async fn list(
+        &self,
+        params: ListBatchTransfersParams,
+    ) -> Result<ListBatchTransfersResponse> {
         self.client
             .get_with_query("/api/v1/batch_transfers", &params)
             .await
@@ -59,9 +62,16 @@ impl<'a> BatchTransfers<'a> {
     /// # API Reference
     ///
     /// `POST /api/v1/batch_transfers/{id}/add_items`
-    pub async fn add_items(&self, id: &str, request: AddBatchItemsRequest) -> Result<BatchTransfer> {
+    pub async fn add_items(
+        &self,
+        id: &str,
+        request: AddBatchItemsRequest,
+    ) -> Result<BatchTransfer> {
         self.client
-            .post(&format!("/api/v1/batch_transfers/{}/add_items", id), &request)
+            .post(
+                &format!("/api/v1/batch_transfers/{}/add_items", id),
+                &request,
+            )
             .await
     }
 

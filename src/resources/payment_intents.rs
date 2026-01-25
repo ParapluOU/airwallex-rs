@@ -68,7 +68,10 @@ impl<'a> PaymentIntents<'a> {
         request: ConfirmPaymentIntentRequest,
     ) -> Result<PaymentIntent> {
         self.client
-            .post(&format!("/api/v1/pa/payment_intents/{}/confirm", id), &request)
+            .post(
+                &format!("/api/v1/pa/payment_intents/{}/confirm", id),
+                &request,
+            )
             .await
     }
 
@@ -83,7 +86,10 @@ impl<'a> PaymentIntents<'a> {
         request: CapturePaymentIntentRequest,
     ) -> Result<PaymentIntent> {
         self.client
-            .post(&format!("/api/v1/pa/payment_intents/{}/capture", id), &request)
+            .post(
+                &format!("/api/v1/pa/payment_intents/{}/capture", id),
+                &request,
+            )
             .await
     }
 
@@ -98,7 +104,10 @@ impl<'a> PaymentIntents<'a> {
         request: CancelPaymentIntentRequest,
     ) -> Result<PaymentIntent> {
         self.client
-            .post(&format!("/api/v1/pa/payment_intents/{}/cancel", id), &request)
+            .post(
+                &format!("/api/v1/pa/payment_intents/{}/cancel", id),
+                &request,
+            )
             .await
     }
 }

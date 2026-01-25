@@ -182,8 +182,8 @@ pub fn compute_signature(
     timestamp: &str,
     payload: &str,
 ) -> Result<String, WebhookError> {
-    let mut mac = HmacSha256::new_from_slice(secret.as_bytes())
-        .map_err(|_| WebhookError::HmacError)?;
+    let mut mac =
+        HmacSha256::new_from_slice(secret.as_bytes()).map_err(|_| WebhookError::HmacError)?;
 
     // value_to_digest = timestamp + payload
     mac.update(timestamp.as_bytes());
@@ -279,7 +279,7 @@ pub fn compute_remote_auth_signature(
     shared_secret: &str,
     nonce: &str,
 ) -> Result<String, WebhookError> {
-    use base64::{engine::general_purpose::STANDARD, Engine};
+    use base64::{Engine, engine::general_purpose::STANDARD};
 
     let mut mac = HmacSha256::new_from_slice(shared_secret.as_bytes())
         .map_err(|_| WebhookError::HmacError)?;
@@ -414,7 +414,12 @@ mod tests {
 
         // Signature should be a base64 string
         assert!(!signature.is_empty());
-        assert!(signature.ends_with('=') || signature.chars().all(|c| c.is_alphanumeric() || c == '+' || c == '/'));
+        assert!(
+            signature.ends_with('=')
+                || signature
+                    .chars()
+                    .all(|c| c.is_alphanumeric() || c == '+' || c == '/')
+        );
 
         // Same inputs should produce same signature
         let signature2 = compute_remote_auth_signature(shared_secret, nonce).unwrap();

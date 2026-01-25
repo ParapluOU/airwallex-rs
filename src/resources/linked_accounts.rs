@@ -95,7 +95,10 @@ impl<'a> LinkedAccounts<'a> {
     /// # API Reference
     ///
     /// `POST /api/v1/linked_accounts/auth`
-    pub async fn initiate_auth(&self, request: InitiateAuthRequest) -> Result<InitiateAuthResponse> {
+    pub async fn initiate_auth(
+        &self,
+        request: InitiateAuthRequest,
+    ) -> Result<InitiateAuthResponse> {
         self.client
             .post("/api/v1/linked_accounts/auth", &request)
             .await

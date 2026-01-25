@@ -107,11 +107,7 @@ pub struct CreatePaymentIntentRequest {
 
 impl CreatePaymentIntentRequest {
     /// Create a new request.
-    pub fn new(
-        request_id: impl Into<String>,
-        amount: f64,
-        currency: impl Into<String>,
-    ) -> Self {
+    pub fn new(request_id: impl Into<String>, amount: f64, currency: impl Into<String>) -> Self {
         Self {
             request_id: request_id.into(),
             amount,

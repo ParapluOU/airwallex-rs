@@ -152,7 +152,10 @@ impl std::fmt::Debug for TokenManager {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("TokenManager")
             .field("config", &self.config)
-            .field("has_token", &self.token.try_read().map(|t| t.is_some()).unwrap_or(false))
+            .field(
+                "has_token",
+                &self.token.try_read().map(|t| t.is_some()).unwrap_or(false),
+            )
             .finish()
     }
 }

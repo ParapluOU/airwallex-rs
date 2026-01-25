@@ -39,7 +39,10 @@ impl<'a> PaymentDisputes<'a> {
     /// Accept a payment dispute.
     pub async fn accept(&self, id: &str, request: &AcceptDisputeRequest) -> Result<PaymentDispute> {
         self.client
-            .post(&format!("/api/v1/pa/payment_disputes/{}/accept", id), request)
+            .post(
+                &format!("/api/v1/pa/payment_disputes/{}/accept", id),
+                request,
+            )
             .await
     }
 

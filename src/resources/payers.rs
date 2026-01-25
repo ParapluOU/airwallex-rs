@@ -25,9 +25,7 @@ impl<'a> Payers<'a> {
     ///
     /// `GET /api/v1/payers`
     pub async fn list(&self, params: ListPayersParams) -> Result<ListPayersResponse> {
-        self.client
-            .get_with_query("/api/v1/payers", &params)
-            .await
+        self.client.get_with_query("/api/v1/payers", &params).await
     }
 
     /// Create a payer.
@@ -77,7 +75,10 @@ impl<'a> Payers<'a> {
     /// `POST /api/v1/payers/validate`
     pub async fn validate(&self, request: CreatePayerRequest) -> Result<()> {
         // Returns "OK" on success, we just discard it
-        let _: String = self.client.post("/api/v1/payers/validate", &request).await?;
+        let _: String = self
+            .client
+            .post("/api/v1/payers/validate", &request)
+            .await?;
         Ok(())
     }
 }

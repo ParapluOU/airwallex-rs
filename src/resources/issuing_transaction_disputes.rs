@@ -77,10 +77,7 @@ impl<'a> IssuingTransactionDisputes<'a> {
     ) -> Result<IssuingTransactionDispute> {
         self.client
             .post(
-                &format!(
-                    "/api/v1/issuing/transaction_disputes/{}/update",
-                    dispute_id
-                ),
+                &format!("/api/v1/issuing/transaction_disputes/{}/update", dispute_id),
                 request,
             )
             .await

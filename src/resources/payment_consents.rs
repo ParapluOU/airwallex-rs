@@ -68,7 +68,10 @@ impl<'a> PaymentConsents<'a> {
         request: UpdatePaymentConsentRequest,
     ) -> Result<PaymentConsent> {
         self.client
-            .post(&format!("/api/v1/pa/payment_consents/{}/update", id), &request)
+            .post(
+                &format!("/api/v1/pa/payment_consents/{}/update", id),
+                &request,
+            )
             .await
     }
 
@@ -85,7 +88,10 @@ impl<'a> PaymentConsents<'a> {
         request: VerifyPaymentConsentRequest,
     ) -> Result<PaymentConsent> {
         self.client
-            .post(&format!("/api/v1/pa/payment_consents/{}/verify", id), &request)
+            .post(
+                &format!("/api/v1/pa/payment_consents/{}/verify", id),
+                &request,
+            )
             .await
     }
 
@@ -102,7 +108,10 @@ impl<'a> PaymentConsents<'a> {
         request: DisablePaymentConsentRequest,
     ) -> Result<PaymentConsent> {
         self.client
-            .post(&format!("/api/v1/pa/payment_consents/{}/disable", id), &request)
+            .post(
+                &format!("/api/v1/pa/payment_consents/{}/disable", id),
+                &request,
+            )
             .await
     }
 }

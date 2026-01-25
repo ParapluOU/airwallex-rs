@@ -4,8 +4,8 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use reqwest::header::{AUTHORIZATION, CONTENT_TYPE};
-use serde::de::DeserializeOwned;
 use serde::Serialize;
+use serde::de::DeserializeOwned;
 
 use crate::auth::TokenManager;
 use crate::config::Config;
@@ -109,11 +109,7 @@ impl Client {
     }
 
     /// Make a POST request to the API.
-    pub async fn post<T: DeserializeOwned, B: Serialize>(
-        &self,
-        path: &str,
-        body: &B,
-    ) -> Result<T> {
+    pub async fn post<T: DeserializeOwned, B: Serialize>(&self, path: &str, body: &B) -> Result<T> {
         self.request(reqwest::Method::POST, path, Some(body)).await
     }
 

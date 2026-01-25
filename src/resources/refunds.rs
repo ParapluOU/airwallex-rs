@@ -4,9 +4,7 @@
 
 use crate::client::Client;
 use crate::error::Result;
-use crate::models::refunds::{
-    CreateRefundRequest, ListRefundsParams, ListRefundsResponse, Refund,
-};
+use crate::models::refunds::{CreateRefundRequest, ListRefundsParams, ListRefundsResponse, Refund};
 
 /// The Refunds resource.
 pub struct Refunds<'a> {
@@ -47,8 +45,6 @@ impl<'a> Refunds<'a> {
     ///
     /// `GET /api/v1/pa/refunds/{id}`
     pub async fn get(&self, id: &str) -> Result<Refund> {
-        self.client
-            .get(&format!("/api/v1/pa/refunds/{}", id))
-            .await
+        self.client.get(&format!("/api/v1/pa/refunds/{}", id)).await
     }
 }

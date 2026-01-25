@@ -28,7 +28,10 @@ impl<'a> GlobalAccounts<'a> {
     /// # API Reference
     ///
     /// `GET /api/v1/global_accounts`
-    pub async fn list(&self, params: ListGlobalAccountsParams) -> Result<ListGlobalAccountsResponse> {
+    pub async fn list(
+        &self,
+        params: ListGlobalAccountsParams,
+    ) -> Result<ListGlobalAccountsResponse> {
         self.client
             .get_with_query("/api/v1/global_accounts", &params)
             .await
@@ -93,7 +96,10 @@ impl<'a> GlobalAccounts<'a> {
         params: ListTransactionsParams,
     ) -> Result<ListTransactionsResponse> {
         self.client
-            .get_with_query(&format!("/api/v1/global_accounts/{}/transactions", id), &params)
+            .get_with_query(
+                &format!("/api/v1/global_accounts/{}/transactions", id),
+                &params,
+            )
             .await
     }
 

@@ -36,9 +36,7 @@ impl<'a> Transfers<'a> {
     ///
     /// `POST /api/v1/transfers/create`
     pub async fn create(&self, request: CreateTransferRequest) -> Result<Transfer> {
-        self.client
-            .post("/api/v1/transfers/create", &request)
-            .await
+        self.client.post("/api/v1/transfers/create", &request).await
     }
 
     /// Get a transfer by ID.

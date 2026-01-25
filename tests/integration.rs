@@ -29,20 +29,20 @@
 //! - deposits:read
 
 use airwallex_rs::{
-    models::{
-        BalanceHistoryParams, CreateCustomerRequest, ListBeneficiariesParams,
-        ListConversionsParams, ListCustomersParams, ListDepositsParams,
-        ListGlobalAccountsParams, ListLinkedAccountsParams, ListPaymentIntentsParams,
-        ListRefundsParams, ListTransfersParams, ListInvoicesParams, ListPayersParams,
-        ListBatchTransfersParams, ListPaymentMethodsParams, ListPaymentConsentsParams,
-        ListFinancialTransactionsParams, ListPaymentLinksParams, ListPaymentDisputesParams,
-        ListAccountsParams, ListCardsParams, ListCardholdersParams, ListIssuingTransactionsParams,
-        ListIssuingAuthorizationsParams, ListConnectedAccountTransfersParams, GetFxRateParams,
-        ListPaymentAttemptsParams, ListSettlementsParams, ListIssuingTransactionDisputesParams,
-        ListPaymentMethodTypesParams, ListBanksParams, ListTreasuryBalancesParams,
-        ListFundingLimitsParams, ListAmendmentsParams,
-    },
     Client, Error,
+    models::{
+        BalanceHistoryParams, CreateCustomerRequest, GetFxRateParams, ListAccountsParams,
+        ListAmendmentsParams, ListBanksParams, ListBatchTransfersParams, ListBeneficiariesParams,
+        ListCardholdersParams, ListCardsParams, ListConnectedAccountTransfersParams,
+        ListConversionsParams, ListCustomersParams, ListDepositsParams,
+        ListFinancialTransactionsParams, ListFundingLimitsParams, ListGlobalAccountsParams,
+        ListInvoicesParams, ListIssuingAuthorizationsParams, ListIssuingTransactionDisputesParams,
+        ListIssuingTransactionsParams, ListLinkedAccountsParams, ListPayersParams,
+        ListPaymentAttemptsParams, ListPaymentConsentsParams, ListPaymentDisputesParams,
+        ListPaymentIntentsParams, ListPaymentLinksParams, ListPaymentMethodTypesParams,
+        ListPaymentMethodsParams, ListRefundsParams, ListSettlementsParams, ListTransfersParams,
+        ListTreasuryBalancesParams,
+    },
 };
 
 fn get_client() -> Client {
@@ -80,7 +80,10 @@ async fn test_authentication_works() {
             // Permission error means auth worked, just lacking scope
         }
         Err(ref e) if is_auth_failure(e) => {
-            panic!("Authentication failed - check your API credentials: {:?}", e);
+            panic!(
+                "Authentication failed - check your API credentials: {:?}",
+                e
+            );
         }
         Err(e) => {
             panic!("Unexpected error: {:?}", e);
@@ -101,7 +104,10 @@ async fn test_balances_current() {
         Ok(balances) => {
             println!("SUCCESS: Got {} balance entries", balances.items.len());
             for balance in &balances.items {
-                println!("  {}: available={}", balance.currency, balance.available_amount);
+                println!(
+                    "  {}: available={}",
+                    balance.currency, balance.available_amount
+                );
             }
             // Verify response structure
             assert!(balances.items.iter().all(|b| !b.currency.is_empty()));
@@ -365,7 +371,10 @@ async fn test_invoices_list() {
         Ok(invoices) => {
             println!("SUCCESS: Got {} invoices", invoices.items.len());
             for invoice in &invoices.items {
-                println!("  {:?}: {:?} {:?}", invoice.id, invoice.currency, invoice.status);
+                println!(
+                    "  {:?}: {:?} {:?}",
+                    invoice.id, invoice.currency, invoice.status
+                );
             }
         }
         Err(ref e) if is_permission_error(e) => {
@@ -481,7 +490,10 @@ async fn test_payers_list() {
         Ok(payers) => {
             println!("SUCCESS: Got {} payers", payers.items.len());
             for payer_contact in &payers.items {
-                let entity_type = payer_contact.payer.as_ref().and_then(|p| p.entity_type.as_deref());
+                let entity_type = payer_contact
+                    .payer
+                    .as_ref()
+                    .and_then(|p| p.entity_type.as_deref());
                 println!(
                     "  {:?}: {:?} ({:?})",
                     payer_contact.id, payer_contact.nickname, entity_type
@@ -511,10 +523,7 @@ async fn test_batch_transfers_list() {
         Ok(batches) => {
             println!("SUCCESS: Got {} batch transfers", batches.items.len());
             for batch in &batches.items {
-                println!(
-                    "  {:?}: {:?} ({:?})",
-                    batch.id, batch.name, batch.status
-                );
+                println!("  {:?}: {:?} ({:?})", batch.id, batch.name, batch.status);
             }
         }
         Err(ref e) if is_permission_error(e) => {
@@ -596,7 +605,10 @@ async fn test_financial_transactions_list() {
 
     match result {
         Ok(transactions) => {
-            println!("SUCCESS: Got {} financial transactions", transactions.items.len());
+            println!(
+                "SUCCESS: Got {} financial transactions",
+                transactions.items.len()
+            );
             for txn in &transactions.items {
                 println!(
                     "  {:?}: {:?} {:?} ({:?})",
@@ -627,10 +639,7 @@ async fn test_payment_links_list() {
         Ok(links) => {
             println!("SUCCESS: Got {} payment links", links.items.len());
             for link in &links.items {
-                println!(
-                    "  {:?}: {:?} ({:?})",
-                    link.id, link.title, link.status
-                );
+                println!("  {:?}: {:?} ({:?})", link.id, link.title, link.status);
             }
         }
         Err(ref e) if is_permission_error(e) => {
@@ -767,7 +776,10 @@ async fn test_issuing_cardholders_list() {
 
     match result {
         Ok(cardholders) => {
-            println!("SUCCESS: Got {} issuing cardholders", cardholders.items.len());
+            println!(
+                "SUCCESS: Got {} issuing cardholders",
+                cardholders.items.len()
+            );
             for cardholder in &cardholders.items {
                 println!(
                     "  {:?}: {:?} ({:?})",
@@ -801,11 +813,17 @@ async fn test_issuing_transactions_list() {
 
     match result {
         Ok(transactions) => {
-            println!("SUCCESS: Got {} issuing transactions", transactions.items.len());
+            println!(
+                "SUCCESS: Got {} issuing transactions",
+                transactions.items.len()
+            );
             for txn in &transactions.items {
                 println!(
                     "  {:?}: {:?} {:?} ({:?})",
-                    txn.transaction_id, txn.transaction_amount, txn.transaction_currency, txn.status
+                    txn.transaction_id,
+                    txn.transaction_amount,
+                    txn.transaction_currency,
+                    txn.status
                 );
             }
         }
@@ -835,11 +853,17 @@ async fn test_issuing_authorizations_list() {
 
     match result {
         Ok(authorizations) => {
-            println!("SUCCESS: Got {} issuing authorizations", authorizations.items.len());
+            println!(
+                "SUCCESS: Got {} issuing authorizations",
+                authorizations.items.len()
+            );
             for auth in &authorizations.items {
                 println!(
                     "  {:?}: {:?} {:?} ({:?})",
-                    auth.transaction_id, auth.transaction_amount, auth.transaction_currency, auth.status
+                    auth.transaction_id,
+                    auth.transaction_amount,
+                    auth.transaction_currency,
+                    auth.status
                 );
             }
         }
@@ -864,12 +888,17 @@ async fn test_issuing_authorizations_list() {
 #[tokio::test]
 async fn test_connected_account_transfers_list() {
     let client = get_client();
-    let params = ListConnectedAccountTransfersParams::new().page_num(0).page_size(10);
+    let params = ListConnectedAccountTransfersParams::new()
+        .page_num(0)
+        .page_size(10);
     let result = client.connected_account_transfers().list(&params).await;
 
     match result {
         Ok(transfers) => {
-            println!("SUCCESS: Got {} connected account transfers", transfers.items.len());
+            println!(
+                "SUCCESS: Got {} connected account transfers",
+                transfers.items.len()
+            );
             for transfer in &transfers.items {
                 println!(
                     "  {:?}: {:?} {:?} ({:?})",
@@ -882,7 +911,10 @@ async fn test_connected_account_transfers_list() {
         }
         Err(e) => {
             let err_str = format!("{:?}", e);
-            if err_str.contains("not enabled") || err_str.contains("forbidden") || err_str.contains("Scale") {
+            if err_str.contains("not enabled")
+                || err_str.contains("forbidden")
+                || err_str.contains("Scale")
+            {
                 println!("SKIPPED: Scale/Connected Accounts feature not enabled for this account");
             } else {
                 panic!("Unexpected error: {:?}", e);
@@ -954,12 +986,8 @@ async fn test_payment_attempts_list() {
 async fn test_settlements_list() {
     let client = get_client();
     // Settlements require date range in ISO date format (YYYY-MM-DD)
-    let params = ListSettlementsParams::new(
-        "USD",
-        "SETTLED",
-        "2024-01-01",
-        "2025-12-31",
-    ).page_size(10);
+    let params =
+        ListSettlementsParams::new("USD", "SETTLED", "2024-01-01", "2025-12-31").page_size(10);
     let result = client.settlements().list(&params).await;
 
     match result {
@@ -993,7 +1021,10 @@ async fn test_issuing_transaction_disputes_list() {
 
     match result {
         Ok(disputes) => {
-            println!("SUCCESS: Got {} issuing transaction disputes", disputes.items.len());
+            println!(
+                "SUCCESS: Got {} issuing transaction disputes",
+                disputes.items.len()
+            );
             for dispute in &disputes.items {
                 println!(
                     "  {:?}: {:?} ({:?})",
@@ -1053,8 +1084,14 @@ async fn test_issuing_config_get() {
     match result {
         Ok(config) => {
             println!("SUCCESS: Got issuing config");
-            println!("  Remote auth settings: {:?}", config.remote_auth_settings.is_some());
-            println!("  Spending limit settings: {:?}", config.spending_limit_settings.is_some());
+            println!(
+                "  Remote auth settings: {:?}",
+                config.remote_auth_settings.is_some()
+            );
+            println!(
+                "  Spending limit settings: {:?}",
+                config.spending_limit_settings.is_some()
+            );
         }
         Err(ref e) if is_permission_error(e) => {
             println!("SKIPPED: issuing_config:read permission not available");
@@ -1084,10 +1121,7 @@ async fn test_payment_config_method_types() {
         Ok(types) => {
             println!("SUCCESS: Got {} payment method types", types.items.len());
             for pmt in &types.items {
-                println!(
-                    "  {:?}: active={:?}",
-                    pmt.name, pmt.active
-                );
+                println!("  {:?}: active={:?}", pmt.name, pmt.active);
             }
         }
         Err(ref e) if is_permission_error(e) => {
@@ -1110,10 +1144,7 @@ async fn test_payment_config_banks() {
         Ok(banks) => {
             println!("SUCCESS: Got {} banks", banks.items.len());
             for bank in &banks.items {
-                println!(
-                    "  {:?}: {:?}",
-                    bank.bank_name, bank.display_name
-                );
+                println!("  {:?}: {:?}", bank.bank_name, bank.display_name);
             }
         }
         Err(ref e) if is_permission_error(e) => {
@@ -1122,7 +1153,10 @@ async fn test_payment_config_banks() {
         Err(e) => {
             // Banks endpoint may not return data for all payment method types/countries
             let err_str = format!("{:?}", e);
-            if err_str.contains("not supported") || err_str.contains("invalid") || err_str.contains("not available") {
+            if err_str.contains("not supported")
+                || err_str.contains("invalid")
+                || err_str.contains("not available")
+            {
                 println!("SKIPPED: online_banking for NL may not be available");
             } else {
                 panic!("Unexpected error: {:?}", e);
@@ -1145,7 +1179,10 @@ async fn test_reconciliation_balances() {
 
     match result {
         Ok(balances) => {
-            println!("SUCCESS: Got {} treasury balance entries", balances.items.len());
+            println!(
+                "SUCCESS: Got {} treasury balance entries",
+                balances.items.len()
+            );
             for balance in &balances.items {
                 println!(
                     "  {:?}: {:?} {:?} ({:?})",
@@ -1221,7 +1258,11 @@ async fn test_conversion_amendments_list() {
 
                 match result {
                     Ok(amendments) => {
-                        println!("SUCCESS: Got {} conversion amendments for conversion {}", amendments.items.len(), conversion_id);
+                        println!(
+                            "SUCCESS: Got {} conversion amendments for conversion {}",
+                            amendments.items.len(),
+                            conversion_id
+                        );
                         for amendment in &amendments.items {
                             println!(
                                 "  {:?}: {:?}",

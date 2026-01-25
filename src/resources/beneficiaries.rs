@@ -79,10 +79,7 @@ impl<'a> Beneficiaries<'a> {
     /// `POST /api/v1/beneficiaries/delete/{beneficiary_id}`
     pub async fn delete(&self, beneficiary_id: &str) -> Result<()> {
         self.client
-            .post_empty_no_response(&format!(
-                "/api/v1/beneficiaries/delete/{}",
-                beneficiary_id
-            ))
+            .post_empty_no_response(&format!("/api/v1/beneficiaries/delete/{}", beneficiary_id))
             .await
     }
 

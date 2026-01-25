@@ -1,3 +1,4 @@
+#![allow(clippy::result_large_err)]
 //! Example: Get current balances from Airwallex.
 //!
 //! This example demonstrates how to:

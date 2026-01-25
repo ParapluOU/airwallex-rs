@@ -54,6 +54,9 @@
 //! # }
 //! ```
 
+// Allow large error variants - boxing would require significant API changes
+#![allow(clippy::result_large_err)]
+
 pub mod auth;
 pub mod client;
 pub mod config;
